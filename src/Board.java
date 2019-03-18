@@ -4,11 +4,13 @@ public class Board {
     private int boardWidth;
     private int boardHeight;
     private int[][] board;
+    private ArrayList<ArrayList> bombCoordinates;
 
     public Board(int boardHeight, int boardWidth) {
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
         board = generateBoard();
+        bombCoordinates = new ArrayList<>();
     }
 
     public int getBoardWidth() {
@@ -29,6 +31,20 @@ public class Board {
         }
         return board;
     }
+
+    ArrayList<ArrayList> setBombCoordinates(int bombCount) {
+
+        for (int i = 0; i < bombCount; i++) {
+            Bombs bomb = new Bombs(boardHeight,boardWidth);
+            if(!bombCoordinates.contains(bomb.getLocation()))
+                bombCoordinates.add(bomb.getLocation());
+            else {
+                return setBombCoordinates(bombCount - i);
+            }
+        }
+        return bombCoordinates;
+    }
+
 
     void setBomb(ArrayList<ArrayList> coordinates){
         for (int i = 0; i < coordinates.size(); i++) {
@@ -112,6 +128,5 @@ public class Board {
             sb.append("\n");
         }
         return sb.toString();
-
     }
 }

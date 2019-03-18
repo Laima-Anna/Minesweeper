@@ -5,14 +5,15 @@ public class Bombs {
     private int boardHeight;
     private int boardWidth;
 
+
     public Bombs(int boardHeight, int boardWidth) {
         this.boardHeight = boardHeight;
         this.boardWidth = boardWidth;
         this.location = new ArrayList<Integer>();
 
         location=generateBomb(boardHeight,boardWidth);
-    }
 
+    }
 
     public ArrayList<Integer> getLocation() {
         return location;
