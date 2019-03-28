@@ -9,8 +9,8 @@ public class MainClass {
         int boardHeight = 8;
         int boardWidth = 10;
         int bombCount = 15;
-        UserBoard board = new UserBoard(boardHeight,boardWidth);
-        Board realBoard = new Board(boardHeight,boardWidth);
+        UserBoard board = new UserBoard(boardHeight, boardWidth);
+        Board realBoard = new Board(boardHeight, boardWidth);
         List<List<Integer>> checked = new ArrayList<>();
         int bombsRighNow = 0;
 
@@ -19,14 +19,14 @@ public class MainClass {
         realBoard.setBomb(coordinates);
         realBoard.setNumbers();
 
-        M_abi.printM_ind(" ",realBoard.getBoard()); //TODO same here
+        M_abi.printM_ind(" ", realBoard.getBoard()); //TODO same here
         System.out.println();
-        M_abi.printM_ind(" ",board.getBoard());
+        M_abi.printM_ind(" ", board.getBoard());
 
         System.out.println("Example of coordinates 3,6 where 3 means row and 6 means column");
         System.out.println("f - flag a bomb, o - open area");
         System.out.println("Example: 3,6,f");
-        while(true){
+        while (true) {
             Scanner sc = new Scanner(System.in);
             System.out.println("Enter coordinates and f or o: ");
             String coord = sc.nextLine();
@@ -36,36 +36,36 @@ public class MainClass {
             int y = Integer.parseInt(uus[1]);
             String symbol = uus[2];
 
-            if(symbol.equals("f")){
-                if(board.getBoard()[x][y]==-5){
-                    board.getBoard()[x][y]=-7;
-                }else board.getBoard()[x][y]=-5;
+            if (symbol.equals("f")) {
+                if (board.getBoard()[x][y] == -5) {
+                    board.getBoard()[x][y] = -7;
+                } else board.getBoard()[x][y] = -5;
 
                 if (realBoard.getBoard()[x][y] == -1) {
                     bombsRighNow += 1;
                 }
 
-            }else if (symbol.equals("o")){
-                board.getBoard()[x][y]=realBoard.getBoard()[x][y];
-                if(realBoard.getBoard()[x][y]==-1) {
+            } else if (symbol.equals("o")) {
+                board.getBoard()[x][y] = realBoard.getBoard()[x][y];
+                if (realBoard.getBoard()[x][y] == -1) {
                     System.out.println("Game Over");
                     break;
-                }else if (realBoard.getBoard()[x][y]==0){
-                    openAround(x,y,board,realBoard,checked);
+                } else if (realBoard.getBoard()[x][y] == 0) {
+                    openAround(x, y, board, realBoard, checked);
 
 
                 }
 
-            }else System.out.println("Wrong input");
+            } else System.out.println("Wrong input");
 
             if (bombsRighNow == bombCount) { //if there is the same number of flags as originally planned
                 System.out.println("You won!");
                 break;
             }
 
-            M_abi.printM_ind(" ",realBoard.getBoard()); //TODO better way? Showing author?
+            M_abi.printM_ind(" ", realBoard.getBoard()); //TODO better way? Showing author?
             System.out.println();
-            M_abi.printM_ind(" ",board.getBoard());
+            M_abi.printM_ind(" ", board.getBoard());
 
 
         }
@@ -73,59 +73,59 @@ public class MainClass {
         //TODO place bombs with better algorithm --
     }
 
-    public static void openAround(int x, int y, UserBoard board, Board realBoard,List<List<Integer>> checked){
+    public static void openAround(int x, int y, UserBoard board, Board realBoard, List<List<Integer>> checked) {
 
-        int[] numbers = realBoard.getNumbersAround(x,y);
+        int[] numbers = realBoard.getNumbersAround(x, y);
         //System.out.println(Arrays.toString(numbers));
 
         List<Integer> uus = new ArrayList<>();
         uus.add(x);
         uus.add(y);
-        if(!checked.contains(uus)) checked.add(uus);
+        if (!checked.contains(uus)) checked.add(uus);
 
 
-        if(numbers[0]!=-9) board.getBoard()[x-1][y-1]=realBoard.getBoard()[x-1][y-1]; //TODO can be a function
-        if(numbers[1]!=-9) board.getBoard()[x-1][y]=realBoard.getBoard()[x-1][y];
-        if(numbers[2]!=-9) board.getBoard()[x-1][y+1]=realBoard.getBoard()[x-1][y+1];
-        if(numbers[3]!=-9) board.getBoard()[x][y+1]=realBoard.getBoard()[x][y+1];
-        if(numbers[4]!=-9) board.getBoard()[x+1][y+1]=realBoard.getBoard()[x+1][y+1];
-        if(numbers[5]!=-9) board.getBoard()[x+1][y]=realBoard.getBoard()[x+1][y];
-        if(numbers[6]!=-9) board.getBoard()[x+1][y-1]=realBoard.getBoard()[x+1][y-1];
-        if(numbers[7]!=-9) board.getBoard()[x][y-1]=realBoard.getBoard()[x][y-1];
+        if (numbers[0] != -9)
+            board.getBoard()[x - 1][y - 1] = realBoard.getBoard()[x - 1][y - 1]; //TODO can be a function
+        if (numbers[1] != -9) board.getBoard()[x - 1][y] = realBoard.getBoard()[x - 1][y];
+        if (numbers[2] != -9) board.getBoard()[x - 1][y + 1] = realBoard.getBoard()[x - 1][y + 1];
+        if (numbers[3] != -9) board.getBoard()[x][y + 1] = realBoard.getBoard()[x][y + 1];
+        if (numbers[4] != -9) board.getBoard()[x + 1][y + 1] = realBoard.getBoard()[x + 1][y + 1];
+        if (numbers[5] != -9) board.getBoard()[x + 1][y] = realBoard.getBoard()[x + 1][y];
+        if (numbers[6] != -9) board.getBoard()[x + 1][y - 1] = realBoard.getBoard()[x + 1][y - 1];
+        if (numbers[7] != -9) board.getBoard()[x][y - 1] = realBoard.getBoard()[x][y - 1];
 
         List<Integer> uus2 = new ArrayList<>();
-        uus2.add(x-1);
-        uus2.add(y-1);
-        if(numbers[0]==0 && !checked.contains(uus2)) openAround(x-1,y-1,board,realBoard,checked);
+        uus2.add(x - 1);
+        uus2.add(y - 1);
+        if (numbers[0] == 0 && !checked.contains(uus2)) openAround(x - 1, y - 1, board, realBoard, checked);
         List<Integer> uus3 = new ArrayList<>();
-        uus3.add(x-1);
+        uus3.add(x - 1);
         uus3.add(y);
-        if(numbers[1]==0 && !checked.contains(uus3)) openAround(x-1,y,board,realBoard,checked);
+        if (numbers[1] == 0 && !checked.contains(uus3)) openAround(x - 1, y, board, realBoard, checked);
         List<Integer> uus4 = new ArrayList<>();
-        uus4.add(x-1);
-        uus4.add(y+1);
-        if(numbers[2]==0 && !checked.contains(uus4)) openAround(x-1,y+1,board,realBoard,checked);
+        uus4.add(x - 1);
+        uus4.add(y + 1);
+        if (numbers[2] == 0 && !checked.contains(uus4)) openAround(x - 1, y + 1, board, realBoard, checked);
         List<Integer> uus5 = new ArrayList<>();
         uus5.add(x);
-        uus5.add(y+1);
-        if(numbers[3]==0 && !checked.contains(uus5)) openAround(x,y+1,board,realBoard,checked);
+        uus5.add(y + 1);
+        if (numbers[3] == 0 && !checked.contains(uus5)) openAround(x, y + 1, board, realBoard, checked);
         List<Integer> uus6 = new ArrayList<>();
-        uus6.add(x+1);
-        uus6.add(y+1);
-        if(numbers[4]==0 && !checked.contains(uus6)) openAround(x+1,y+1,board,realBoard,checked);
+        uus6.add(x + 1);
+        uus6.add(y + 1);
+        if (numbers[4] == 0 && !checked.contains(uus6)) openAround(x + 1, y + 1, board, realBoard, checked);
         List<Integer> uus7 = new ArrayList<>();
-        uus7.add(x+1);
+        uus7.add(x + 1);
         uus7.add(y);
-        if(numbers[5]==0 && !checked.contains(uus7)) openAround(x+1,y,board,realBoard,checked);
+        if (numbers[5] == 0 && !checked.contains(uus7)) openAround(x + 1, y, board, realBoard, checked);
         List<Integer> uus8 = new ArrayList<>();
-        uus8.add(x+1);
-        uus8.add(y-1);
-        if(numbers[6]==0 && !checked.contains(uus8)) openAround(x+1,y-1,board,realBoard,checked);
+        uus8.add(x + 1);
+        uus8.add(y - 1);
+        if (numbers[6] == 0 && !checked.contains(uus8)) openAround(x + 1, y - 1, board, realBoard, checked);
         List<Integer> uus9 = new ArrayList<>();
         uus9.add(x);
-        uus9.add(y-1);
-        if(numbers[7]==0 && !checked.contains(uus9)) openAround(x,y-1,board,realBoard,checked);
-
+        uus9.add(y - 1);
+        if (numbers[7] == 0 && !checked.contains(uus9)) openAround(x, y - 1, board, realBoard, checked);
 
 
     }
