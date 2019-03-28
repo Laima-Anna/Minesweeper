@@ -9,7 +9,7 @@ public class UserBoard extends Board{
 
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
-                board[i][j] = 9;
+                board[i][j] = -7;
             }
         }
         return board;
