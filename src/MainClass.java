@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -13,6 +12,7 @@ public class MainClass {
         UserBoard board = new UserBoard(boardHeight,boardWidth);
         Board realBoard = new Board(boardHeight,boardWidth);
         List<List<Integer>> checked = new ArrayList<>();
+        int bombsRighNow = 0;
 
         ArrayList<ArrayList> coordinates = realBoard.setBombCoordinates(bombCount);
 
@@ -40,6 +40,11 @@ public class MainClass {
                 if(board.getBoard()[x][y]==-5){
                     board.getBoard()[x][y]=-7;
                 }else board.getBoard()[x][y]=-5;
+
+                if (realBoard.getBoard()[x][y] == -1) {
+                    bombsRighNow += 1;
+                }
+
             }else if (symbol.equals("o")){
                 board.getBoard()[x][y]=realBoard.getBoard()[x][y];
                 if(realBoard.getBoard()[x][y]==-1) {
@@ -53,10 +58,15 @@ public class MainClass {
 
             }else System.out.println("Wrong input");
 
+            if (bombsRighNow == bombCount) { //if there is the same number of flags as originally planned
+                System.out.println("You won!");
+                break;
+            }
 
             M_abi.printM_ind(" ",realBoard.getBoard()); //TODO better way? Showing author?
             System.out.println();
             M_abi.printM_ind(" ",board.getBoard());
+
 
         }
 
@@ -66,7 +76,7 @@ public class MainClass {
     public static void openAround(int x, int y, UserBoard board, Board realBoard,List<List<Integer>> checked){
 
         int[] numbers = realBoard.getNumbersAround(x,y);
-        System.out.println(Arrays.toString(numbers));
+        //System.out.println(Arrays.toString(numbers));
 
         List<Integer> uus = new ArrayList<>();
         uus.add(x);
@@ -74,7 +84,6 @@ public class MainClass {
         if(!checked.contains(uus)) checked.add(uus);
 
 
-        System.out.println("----------------");
         if(numbers[0]!=-9) board.getBoard()[x-1][y-1]=realBoard.getBoard()[x-1][y-1]; //TODO can be a function
         if(numbers[1]!=-9) board.getBoard()[x-1][y]=realBoard.getBoard()[x-1][y];
         if(numbers[2]!=-9) board.getBoard()[x-1][y+1]=realBoard.getBoard()[x-1][y+1];
