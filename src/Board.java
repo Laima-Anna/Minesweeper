@@ -13,6 +13,9 @@ public class Board {
         bombCoordinates = new ArrayList<>();
     }
 
+    public int[][] getBoard() {
+        return board;
+    }
 
     private int[][] generateBoard() {
         board = new int[boardHeight][boardWidth];
