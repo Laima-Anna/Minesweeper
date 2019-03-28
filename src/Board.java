@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 
 public class Board {
-    private int boardWidth;
-    private int boardHeight;
-    private int[][] board;
+    int boardWidth;
+    int boardHeight;
+    int[][] board;
     private ArrayList<ArrayList> bombCoordinates;
 
     public Board(int boardHeight, int boardWidth) {
@@ -13,13 +13,6 @@ public class Board {
         bombCoordinates = new ArrayList<>();
     }
 
-    public int getBoardWidth() {
-        return boardWidth;
-    }
-
-    public int getBoardHeight() {
-        return boardHeight;
-    }
 
     private int[][] generateBoard() {
         board = new int[boardHeight][boardWidth];
@@ -31,6 +24,8 @@ public class Board {
         }
         return board;
     }
+
+
 
     ArrayList<ArrayList> setBombCoordinates(int bombCount) {
 
@@ -44,6 +39,8 @@ public class Board {
         }
         return bombCoordinates;
     }
+
+
 
 
     void setBomb(ArrayList<ArrayList> coordinates){
