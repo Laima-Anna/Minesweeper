@@ -47,16 +47,26 @@ public class Board {
 
 
     void setBomb(ArrayList<ArrayList> coordinates){
-        for (int i = 0; i < coordinates.size(); i++) {
+        for (ArrayList coordinate : coordinates) {
             for (int j = 0; j < boardHeight; j++) {
                 for (int k = 0; k < boardWidth; k++) {
-                    if((int)coordinates.get(i).get(0)==j && (int)coordinates.get(i).get(1)==k){
+                    if ((int) coordinate.get(0) == j && (int) coordinate.get(1) == k) {
                         //System.out.println(j+"-"+k);
-                        board[j][k]=-1;
+                        board[j][k] = -1;
                     }
                 }
             }
         }
+    }
+
+    int countOpened(){
+        int count=0;
+        for (int i = 0; i < boardHeight; i++) {
+            for (int j = 0; j < boardWidth; j++) {
+                if(board[i][j]>=0)count+=1;
+            }
+        }
+        return count;
     }
 
     int[] getNumbersAround(int x, int y){ //TODO better way of doing? --Eva

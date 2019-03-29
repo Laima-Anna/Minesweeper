@@ -9,10 +9,12 @@ public class MainClass {
         int boardHeight = 8;
         int boardWidth = 10;
         int bombCount = 15;
-        UserBoard board = new UserBoard(boardHeight, boardWidth);
+        UserBoard userBoard = new UserBoard(boardHeight, boardWidth);
         Board realBoard = new Board(boardHeight, boardWidth);
         List<List<Integer>> checked = new ArrayList<>();
-        int bombsRighNow = 0;
+        int bombsRightNow = 0;
+        int openedSquaresNow = 0;
+        int allFreeSpaces = boardHeight*boardWidth-bombCount;
 
         ArrayList<ArrayList> coordinates = realBoard.setBombCoordinates(bombCount);
 
@@ -21,7 +23,7 @@ public class MainClass {
 
         M_abi.printM_ind(" ", realBoard.getBoard()); //TODO same here
         System.out.println();
-        M_abi.printM_ind(" ", board.getBoard());
+        M_abi.printM_ind(" ", userBoard.getBoard());
 
         System.out.println("Example of coordinates 3,6 where 3 means row and 6 means column");
         System.out.println("f - flag a bomb, o - open area");
@@ -37,44 +39,41 @@ public class MainClass {
             String symbol = uus[2];
 
             if (symbol.equals("f")) {
-                if (board.getBoard()[x][y] == -5) {
-                    board.getBoard()[x][y] = -7;
-                } else board.getBoard()[x][y] = -5;
+                if (userBoard.getBoard()[x][y] == -5) {
+                    userBoard.getBoard()[x][y] = -7;
+                } else userBoard.getBoard()[x][y] = -5;
 
                 if (realBoard.getBoard()[x][y] == -1) {
-                    bombsRighNow += 1;
+                    bombsRightNow += 1;
                 }
 
             } else if (symbol.equals("o")) {
-                board.getBoard()[x][y] = realBoard.getBoard()[x][y];
+                userBoard.getBoard()[x][y] = realBoard.getBoard()[x][y];
                 if (realBoard.getBoard()[x][y] == -1) {
                     System.out.println("Game Over");
                     break;
                 } else if (realBoard.getBoard()[x][y] == 0) {
-                    openAround(x, y, board, realBoard, checked);
-
-
+                    openAround(x, y, userBoard, realBoard, checked);
                 }
-
+                openedSquaresNow=userBoard.countOpened(); //TODO check
             } else System.out.println("Wrong input");
 
-            if (bombsRighNow == bombCount) { //if there is the same number of flags as originally planned
+            if (openedSquaresNow==allFreeSpaces) { //if there is the same number of flags as originally planned
                 System.out.println("You won!");
                 break;
             }
 
             M_abi.printM_ind(" ", realBoard.getBoard()); //TODO better way? Showing author?
             System.out.println();
-            M_abi.printM_ind(" ", board.getBoard());
+            M_abi.printM_ind(" ", userBoard.getBoard());
 
 
         }
 
-        //TODO place bombs with better algorithm --
     }
 
     public static void openAround(int x, int y, UserBoard board, Board realBoard, List<List<Integer>> checked) {
-
+    //TODO should we leave it here?
         int[] numbers = realBoard.getNumbersAround(x, y);
         //System.out.println(Arrays.toString(numbers));
 
