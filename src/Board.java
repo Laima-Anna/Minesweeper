@@ -157,62 +157,30 @@ public class Board {
         return numbers;
     }
 
+    boolean checkIndexOutOfBounds(int i, int j, int height, int width) {
+        if (i < 0 || j < 0 || i >= height || j >= width)
+            return false;
+        return true;
+    }
 
+    int countBombs(int i, int j) {
+        int counter = 0;
+        for (int row = i-1; row < i+2; row++) {
+            for (int col = j-1; col < j+2; col++) {
+                if (checkIndexOutOfBounds(row, col, boardHeight, boardWidth) && board[row][col] == -1) {
+                    counter++;
+                }
+            }
+        }
+        return counter;
+    }
 
-    void setNumbers(){ //TODO better way? --Eva
+    void setNumbers(){
+
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
                 if(board[i][j]!=-1) {
-                    if (i == 0 && j == 0) {
-                        if (board[i + 1][j] == -1) board[i][j] += 1;
-                        if (board[i + 1][j + 1] == -1) board[i][j] += 1;
-                        if (board[i][j + 1] == -1) board[i][j] += 1;
-                    } else if (i == 0 && j == boardWidth - 1) {
-                        if (board[i][j-1] == -1) board[i][j] += 1;
-                        if (board[i + 1][j -1] == -1) board[i][j] += 1;
-                        if (board[i+1][j] == -1) board[i][j] += 1;
-                    } else if (i == boardHeight - 1 && j == 0) {
-                        if (board[i -1][j] == -1) board[i][j] += 1;
-                        if (board[i - 1][j + 1] == -1) board[i][j] += 1;
-                        if (board[i][j + 1] == -1) board[i][j] += 1;
-                    } else if (i == boardHeight - 1 && j == boardWidth - 1) {
-                        if (board[i ][j-1] == -1) board[i][j] += 1;
-                        if (board[i - 1][j - 1] == -1) board[i][j] += 1;
-                        if (board[i-1][j ] == -1) board[i][j] += 1;
-                    } else if (i == 0) {
-                        if (board[i ][j-1] == -1) board[i][j] += 1;
-                        if (board[i + 1][j - 1] == -1) board[i][j] += 1;
-                        if (board[i+1][j ] == -1) board[i][j] += 1;
-                        if (board[i + 1][j+1] == -1) board[i][j] += 1;
-                        if (board[i ][j + 1] == -1) board[i][j] += 1;
-                    } else if (j == 0) {
-                        if (board[i -1][j] == -1) board[i][j] += 1;
-                        if (board[i - 1][j + 1] == -1) board[i][j] += 1;
-                        if (board[i][j +1] == -1) board[i][j] += 1;
-                        if (board[i + 1][j+1] == -1) board[i][j] += 1;
-                        if (board[i +1][j ] == -1) board[i][j] += 1;
-                    } else if (i == boardHeight - 1) {
-                        if (board[i ][j-1] == -1) board[i][j] += 1;
-                        if (board[i -1 ][j - 1] == -1) board[i][j] += 1;
-                        if (board[i-1][j ] == -1) board[i][j] += 1;
-                        if (board[i - 1][j+1] == -1) board[i][j] += 1;
-                        if (board[i ][j + 1] == -1) board[i][j] += 1;
-                    } else if (j == boardWidth - 1) {
-                        if (board[i +1][j] == -1) board[i][j] += 1;
-                        if (board[i + 1][j - 1] == -1) board[i][j] += 1;
-                        if (board[i][j-1 ] == -1) board[i][j] += 1;
-                        if (board[i - 1][j-1] == -1) board[i][j] += 1;
-                        if (board[i -1][j ] == -1) board[i][j] += 1;
-                    } else {
-                        if (board[i ][j-1] == -1) board[i][j] += 1;
-                        if (board[i - 1][j -1] == -1) board[i][j] += 1;
-                        if (board[i-1][j ] == -1) board[i][j] += 1;
-                        if (board[i - 1][j+1] == -1) board[i][j] += 1;
-                        if (board[i ][j + 1] == -1) board[i][j] += 1;
-                        if (board[i +1][j+1] == -1) board[i][j] += 1;
-                        if (board[i + 1][j ] == -1) board[i][j] += 1;
-                        if (board[i+1][j -1] == -1) board[i][j] += 1;
-                    }
+                    board[i][j] = countBombs(i, j);
                 }
             }
         }
