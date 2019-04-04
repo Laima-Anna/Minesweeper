@@ -1,2 +1,2 @@
 # Minesweeper
-Mäng
+MÃ¤ng
