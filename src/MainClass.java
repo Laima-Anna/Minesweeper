@@ -21,22 +21,32 @@ public class MainClass {
         realBoard.setBomb(coordinates);
         realBoard.setNumbers();
 
-        M_abi.printM_ind(" ", realBoard.getBoard()); //TODO same here
+        //M_abi.printM_ind(" ", realBoard.getBoard());
         System.out.println();
         M_abi.printM_ind(" ", userBoard.getBoard());
 
         System.out.println("Example of coordinates 3,6 where 3 means row and 6 means column");
         System.out.println("f - flag a bomb, o - open area");
         System.out.println("Example: 3,6,f");
-        while (true) {
+
+        while (true) { //game loop
             Scanner sc = new Scanner(System.in);
             System.out.println("Enter coordinates and f or o: ");
             String coord = sc.nextLine();
+
             String[] uus = coord.split(",");
 
-            int x = Integer.parseInt(uus[0]);
-            int y = Integer.parseInt(uus[1]);
-            String symbol = uus[2];
+            int x=0;
+            int y=0;
+            String symbol="";
+            try {
+                x = Integer.parseInt(uus[0]);
+                y = Integer.parseInt(uus[1]);
+                symbol = uus[2];
+            }catch (Exception e){
+                System.out.println("Wrong input");
+            }
+
 
             if (symbol.equals("f")) {
                 if (userBoard.getBoard()[x][y] == -5) {
@@ -55,15 +65,15 @@ public class MainClass {
                 } else if (realBoard.getBoard()[x][y] == 0) {
                     openAround(x, y, userBoard, realBoard, checked);
                 }
-                openedSquaresNow = userBoard.countOpened(); //TODO check
-            } else System.out.println("Wrong input");
+                openedSquaresNow = userBoard.countOpened();
+            };
 
             if (openedSquaresNow == allFreeSpaces) { //if there is the same number of flags as originally planned
                 System.out.println("You won!");
                 break;
             }
 
-            M_abi.printM_ind(" ", realBoard.getBoard()); //TODO better way? Showing author?
+            //M_abi.printM_ind(" ", realBoard.getBoard());
             System.out.println();
             M_abi.printM_ind(" ", userBoard.getBoard());
         }
@@ -71,7 +81,6 @@ public class MainClass {
 
 
     public static void openAround(int x, int y, UserBoard board, Board realBoard, List<List<Integer>> checked) {
-        //TODO should we leave it here?
         int[] numbers = realBoard.getNumbersAround(x, y);
 
         List<Integer> uus = new ArrayList<>();
@@ -80,7 +89,7 @@ public class MainClass {
         if (!checked.contains(uus)) checked.add(uus);
 
         if (numbers[0] != -9)
-            board.getBoard()[x - 1][y - 1] = realBoard.getBoard()[x - 1][y - 1]; //TODO can be a function
+            board.getBoard()[x - 1][y - 1] = realBoard.getBoard()[x - 1][y - 1];
         if (numbers[1] != -9) board.getBoard()[x - 1][y] = realBoard.getBoard()[x - 1][y];
         if (numbers[2] != -9) board.getBoard()[x - 1][y + 1] = realBoard.getBoard()[x - 1][y + 1];
         if (numbers[3] != -9) board.getBoard()[x][y - 1] = realBoard.getBoard()[x][y - 1];
