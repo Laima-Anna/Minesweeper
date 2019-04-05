@@ -66,9 +66,9 @@ public class MainClass {
                     openAround(x, y, userBoard, realBoard, checked);
                 }
                 openedSquaresNow = userBoard.countOpened();
-            };
+            }
 
-            if (openedSquaresNow == allFreeSpaces) { //if there is the same number of flags as originally planned
+            if (openedSquaresNow == allFreeSpaces) { //if there is the same number of opened squares as originally planned
                 System.out.println("You won!");
                 break;
             }
@@ -76,6 +76,8 @@ public class MainClass {
             //M_abi.printM_ind(" ", realBoard.getBoard());
             System.out.println();
             M_abi.printM_ind(" ", userBoard.getBoard());
+
+            //TODO first cannot be a bomb
         }
     }
 
@@ -88,8 +90,7 @@ public class MainClass {
         uus.add(y);
         if (!checked.contains(uus)) checked.add(uus);
 
-        if (numbers[0] != -9)
-            board.getBoard()[x - 1][y - 1] = realBoard.getBoard()[x - 1][y - 1];
+        if (numbers[0] != -9) board.getBoard()[x - 1][y - 1] = realBoard.getBoard()[x - 1][y - 1];
         if (numbers[1] != -9) board.getBoard()[x - 1][y] = realBoard.getBoard()[x - 1][y];
         if (numbers[2] != -9) board.getBoard()[x - 1][y + 1] = realBoard.getBoard()[x - 1][y + 1];
         if (numbers[3] != -9) board.getBoard()[x][y - 1] = realBoard.getBoard()[x][y - 1];
