@@ -1,7 +1,10 @@
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Stage;
 
@@ -10,7 +13,7 @@ public class MainClass extends Application {
     public void start(Stage primaryStage) throws Exception {
         BorderPane root = getMainPane();
 
-        Scene scene = new Scene(root, 500, 300);
+        Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -26,9 +29,7 @@ public class MainClass extends Application {
 
     private TilePane getTilePane() {
         TilePane tilepane = new TilePane();
-        Label label2 = new Label("tsfsdfsgsd");
-        tilepane.getChildren().add(label2);
-
+        setImagetoTilePane(tilepane);
         return tilepane;
     }
 
@@ -39,8 +40,24 @@ public class MainClass extends Application {
         return borderpane;
     }
 
+    //Method to set board game tiles to board
+    private void setImagetoTilePane(TilePane tilepane) {
+        Image tile = new Image("File:images/square.png");
+
+        //set preferred column nr to boardwidth
+        tilepane.setPrefColumns(9);
+
+        //ignores root size, ensures that preferred size of tilepane is used
+        tilepane.setMaxWidth(Region.USE_PREF_SIZE);
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                tilepane.getChildren().add(new ImageView(tile));
+            }
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
 }
- //TODO mänguruudustik - eva
