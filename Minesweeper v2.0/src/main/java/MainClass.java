@@ -4,8 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.TilePane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class MainClass extends Application {
@@ -21,16 +20,16 @@ public class MainClass extends Application {
     private BorderPane getMainPane() {
         BorderPane pane = new BorderPane();
         BorderPane other = this.getBorderPane();
-        TilePane another = this.getTilePane();
+        GridPane another = this.getGridPane();
         pane.setTop(other);
         pane.setCenter(another);
         return pane;
     }
 
-    private TilePane getTilePane() {
-        TilePane tilepane = new TilePane();
-        setImagetoTilePane(tilepane);
-        return tilepane;
+    private GridPane getGridPane() {
+        GridPane gridpane = new GridPane();
+        setImagetoGridPane(gridpane);
+        return gridpane;
     }
 
     private BorderPane getBorderPane() {
@@ -41,18 +40,13 @@ public class MainClass extends Application {
     }
 
     //Method to set board game tiles to board
-    private void setImagetoTilePane(TilePane tilepane) {
+    private void setImagetoGridPane(GridPane gridpane) {
         Image tile = new Image("File:images/square.png");
-
-        //set preferred column nr to boardwidth
-        tilepane.setPrefColumns(9);
-
-        //ignores root size, ensures that preferred size of tilepane is used
-        tilepane.setMaxWidth(Region.USE_PREF_SIZE);
 
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                tilepane.getChildren().add(new ImageView(tile));
+                ImageView imageview = new ImageView(tile);
+                gridpane.add(imageview, i, j);
             }
         }
     }
