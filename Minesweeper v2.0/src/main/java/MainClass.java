@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainClass extends Application {
+
+    List<ImageView> images = getImages();
+
     @Override
     public void start(Stage primaryStage){
         BorderPane root = getMainPane();
@@ -42,6 +45,34 @@ public class MainClass extends Application {
         Label label1 = new Label("tere");
         borderpane.setTop(label1);
         return borderpane;
+    }
+
+    private List<ImageView> getImages() {
+        List<ImageView> images = new ArrayList<>();
+
+        images.add(setImageViews("File:images/Originalsquare.png"));
+        images.add(setImageViews("File:images/One.png"));
+        images.add(setImageViews("File:images/Two.png"));
+        images.add(setImageViews("File:images/Three.png"));
+        images.add(setImageViews("File:images/Four.png"));
+        images.add(setImageViews("File:images/Five.png"));
+        images.add(setImageViews("File:images/Six.png"));
+        images.add(setImageViews("File:images/Seven.png"));
+        images.add(setImageViews("File:images/Eight.png"));
+        images.add(setImageViews("File:images/Square.png"));
+        images.add(setImageViews("File:images/Bomb.png"));
+        images.add(setImageViews("File:images/SelectedBomb.png"));
+        images.add(setImageViews("File:images/WrongBombLocation.png"));
+        images.add(setImageViews("File:images/Flag.png"));
+        images.add(setImageViews("File:images/Question.png"));
+        images.add(setImageViews("File:images/SelectedQuestion.png"));
+
+        return images;
+    }
+
+    private ImageView setImageViews(String file) {
+        Image image = new Image(file);
+        return new ImageView(image);
     }
 
     //Method to set board game tiles to board
