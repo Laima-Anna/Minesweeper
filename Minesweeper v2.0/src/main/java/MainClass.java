@@ -1,29 +1,25 @@
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class MainClass extends Application {
 
-    List<ImageView> images = getImages();
+    List<Image> images = getImages();
 
-    UserBoard userBoard;
-    Board realBoard;
-    int bombsRightNow;
-    int openedSquaresNow;
-    List<List<Integer>> checked;
-    int allFreeSpaces;
+    private UserBoard userBoard;
+    private Board realBoard;
+    private int bombsRightNow;
+    private int openedSquaresNow;
+    private List<List<Integer>> checked;
+    private int allFreeSpaces;
 
     @Override
     public void start(Stage primaryStage){
@@ -75,47 +71,38 @@ public class MainClass extends Application {
         return borderpane;
     }
 
-    private List<ImageView> getImages() {
-        List<ImageView> images = new ArrayList<>();
+    private List<Image> getImages() {
+        List<Image> images = new ArrayList<>();
 
-        images.add(setImageViews("File:images/Originalsquare.png"));
-        images.add(setImageViews("File:images/One.png"));
-        images.add(setImageViews("File:images/Two.png"));
-        images.add(setImageViews("File:images/Three.png"));
-        images.add(setImageViews("File:images/Four.png"));
-        images.add(setImageViews("File:images/Five.png"));
-        images.add(setImageViews("File:images/Six.png"));
-        images.add(setImageViews("File:images/Seven.png"));
-        images.add(setImageViews("File:images/Eight.png"));
-        images.add(setImageViews("File:images/Square.png"));
-        images.add(setImageViews("File:images/Bomb.png"));
-        images.add(setImageViews("File:images/SelectedBomb.png"));
-        images.add(setImageViews("File:images/WrongBombLocation.png"));
-        images.add(setImageViews("File:images/Flag.png"));
-        images.add(setImageViews("File:images/Question.png"));
-        images.add(setImageViews("File:images/SelectedQuestion.png"));
+        images.add(new Image ("File:images/Originalsquare.png"));
+        images.add(new Image ("File:images/One.png"));
+        images.add(new Image ("File:images/Two.png"));
+        images.add(new Image ("File:images/Three.png"));
+        images.add(new Image ("File:images/Four.png"));
+        images.add(new Image ("File:images/Five.png"));
+        images.add(new Image ("File:images/Six.png"));
+        images.add(new Image ("File:images/Seven.png"));
+        images.add(new Image ("File:images/Eight.png"));
+        images.add(new Image ("File:images/Square.png"));
+        images.add(new Image ("File:images/Bomb.png"));
+        images.add(new Image ("File:images/SelectedBomb.png"));
+        images.add(new Image ("File:images/WrongBombLocation.png"));
+        images.add(new Image ("File:images/Flag.png"));
+        images.add(new Image ("File:images/Question.png"));
+        images.add(new Image ("File:images/SelectedQuestion.png"));
 
         return images;
     }
 
-    private ImageView setImageViews(String file) {
-        Image image = new Image(file);
-        return new ImageView(image);
-    }
 
     //Method to set board game tiles to board
     private void setImageToGridPane(GridPane gridpane) {
-        Image tile = new Image("File:images/square.png");
-        Image tile2 = new Image("File:images/checkbox.png");
-        Image tile3 = new Image("File:images/blank-check-box.png");
-
-
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 Label label = new Label();
-                ImageView view = new ImageView(tile);
-                ImageView view2 = new ImageView(tile2);
-                ImageView view3 = new ImageView(tile3);
+                ImageView view = new ImageView(images.get(0));
+                ImageView view2 = new ImageView(images.get(13));
+                ImageView view3 = new ImageView(images.get(14));
                 label.setGraphic(view);
                 gridpane.add(label, i, j);
 
@@ -127,7 +114,7 @@ public class MainClass extends Application {
                         if (realBoard.getBoard()[x][y] == -1) {
                             System.out.println("Game Over");
                             System.exit(1);
-                            //TODO how to gameover
+                            //TODO how to
                         } else if (realBoard.getBoard()[x][y] == 0) {
                             openAround(x, y, userBoard, realBoard, checked);
                         }
