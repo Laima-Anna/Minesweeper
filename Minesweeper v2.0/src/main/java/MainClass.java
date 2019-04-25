@@ -47,6 +47,7 @@ public class MainClass extends Application {
     //Method to set board game tiles to board
     private void setImageToGridPane(GridPane gridpane) {
         Image tile = new Image("File:images/square.png");
+        Image tile2 = new Image("File:images/checkbox.png");
 
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
@@ -56,6 +57,7 @@ public class MainClass extends Application {
                 gridpane.add(label, i, j);
                 label.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                     System.out.println("Tile pressed ");
+                    label.setGraphic(new ImageView(tile2));
                     event.consume();
                 });
 
@@ -84,7 +86,7 @@ public class MainClass extends Application {
         if (numbers[6] != -9) userBoard.getBoard()[x + 1][y] = realBoard.getBoard()[x + 1][y];
         if (numbers[7] != -9) userBoard.getBoard()[x + 1][y + 1] = realBoard.getBoard()[x + 1][y + 1];
 
-        //TODO here
+        //TODO here and for cycle with values x and y
         List<Integer> uus2 = new ArrayList<>();
         uus2.add(x - 1);
         uus2.add(y - 1);
