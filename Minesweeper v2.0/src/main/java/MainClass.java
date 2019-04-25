@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -11,10 +12,18 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MainClass extends Application {
 
     List<ImageView> images = getImages();
+
+    UserBoard userBoard;
+    Board realBoard;
+    int bombsRightNow;
+    int openedSquaresNow;
+    List<List<Integer>> checked;
+    int allFreeSpaces;
 
     @Override
     public void start(Stage primaryStage){
@@ -23,6 +32,25 @@ public class MainClass extends Application {
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        startGame();
+    }
+
+    private void startGame(){
+        int boardHeight = 8;
+        int boardWidth = 10;
+        int bombCount = 15;
+        userBoard = new UserBoard(boardHeight, boardWidth);
+        realBoard = new Board(boardHeight, boardWidth);
+        checked = new ArrayList<>();
+        bombsRightNow = 0;
+        openedSquaresNow = 0;
+        allFreeSpaces = boardHeight * boardWidth - bombCount;
+
+        List<ArrayList> coordinates = realBoard.setBombCoordinates(bombCount);
+
+        realBoard.setBomb(coordinates);
+        realBoard.setNumbers();
     }
 
     private BorderPane getMainPane() {
@@ -79,18 +107,53 @@ public class MainClass extends Application {
     private void setImageToGridPane(GridPane gridpane) {
         Image tile = new Image("File:images/square.png");
         Image tile2 = new Image("File:images/checkbox.png");
+        Image tile3 = new Image("File:images/blank-check-box.png");
+
 
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                ImageView imageview = new ImageView(tile);
                 Label label = new Label();
-                label.setGraphic(imageview);
+                ImageView view = new ImageView(tile);
+                ImageView view2 = new ImageView(tile2);
+                ImageView view3 = new ImageView(tile3);
+                label.setGraphic(view);
                 gridpane.add(label, i, j);
-                label.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                    System.out.println("Tile pressed ");
-                    label.setGraphic(new ImageView(tile2));
+
+                label.setOnMousePressed(event -> {
+                    if(event.isPrimaryButtonDown()) {
+                        int x = GridPane.getRowIndex(label);
+                        int y = GridPane.getColumnIndex(label);
+                        userBoard.getBoard()[x][y] = realBoard.getBoard()[x][y];
+                        if (realBoard.getBoard()[x][y] == -1) {
+                            System.out.println("Game Over");
+                            System.exit(1);
+                            //TODO how to gameover
+                        } else if (realBoard.getBoard()[x][y] == 0) {
+                            openAround(x, y, userBoard, realBoard, checked);
+                        }
+                        openedSquaresNow = userBoard.countOpened();
+                        printM_ind(" ", userBoard.getBoard());
+
+                    } else if(event.isSecondaryButtonDown()){
+                        if(label.getGraphic().equals(view)){
+                            label.setGraphic(view2);
+                            System.out.println("1");
+                        } else if(label.getGraphic().equals(view2)){
+                            label.setGraphic(view3);
+                            System.out.println("2");
+                        }else if(label.getGraphic().equals(view3)){
+                            label.setGraphic(view);
+                            System.out.println("2");
+                        }
+                    }
+
+                    if (openedSquaresNow == allFreeSpaces) { //if there is the same number of opened squares as originally planned
+                        System.out.println("You won!");
+                    }
+
                     event.consume();
                 });
+
 
             }
         }
@@ -157,5 +220,62 @@ public class MainClass extends Application {
         uus9.add(x+1);
         uus9.add(y +1);
         if (numbers[7] == 0 && !checked.contains(uus9)) openAround(x+1, y + 1, userBoard, realBoard, checked);
+    }
+
+    public static String toStringJ(int[] var0, int var1, String var2) {
+        String var3 = "";
+        String var4 = "%" + var1 + "d";
+
+        for (int var5 = 0; var5 < var0.length; ++var5) {
+            if (var5 == 0) {
+                var3 = var3 + String.format(var4, var0[var5]);
+            } else {
+                var3 = var3 + var2 + String.format(var4, var0[var5]);
+            }
+        }
+
+        return var3;
+    }
+
+
+
+    public static void printM_ind(String var0, int[][] var1) {
+        int var2 = -2147483648;
+        int[][] var3 = var1;
+        int var4 = var1.length;
+
+        for (int var5 = 0; var5 < var4; ++var5) {
+            int[] var6 = var3[var5];
+            int[] var7 = var6;
+            int var8 = var6.length;
+
+            for (int var9 = 0; var9 < var8; ++var9) {
+                int var10 = var7[var9];
+                int var11 = ("" + var10).length();
+                if (var11 > var2) {
+                    var2 = var11;
+                }
+            }
+        }
+
+        int[] var12 = new int[var1[0].length];
+
+        for (var4 = 0; var4 < var1[0].length; var12[var4] = var4++) {
+        }
+
+        System.out.println(var0 + "   " + toStringJ(var12, var2, ".") + ".");
+
+        for (var4 = 0; var4 < var1.length; ++var4) {
+            String var13;
+            if (var4 < 10) {
+                var13 = var0 + " " + var4 + ". ";
+            } else {
+                var13 = var0 + var4 + ". ";
+            }
+
+            System.out.print(var13 + toStringJ(var1[var4], var2, " "));
+            System.out.println();
+        }
+
     }
 }
