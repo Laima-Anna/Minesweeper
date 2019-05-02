@@ -227,7 +227,9 @@ public class MainClass extends Application {
                 label.setGraphic(view);
                 gridpane.add(label, i, j);
 
+                //TODO - keyboard event and mousepressed event
                 label.setOnMousePressed(event -> {
+                    //TODO - first click is not bomb
                     if (event.isPrimaryButtonDown()) {
                         int x = GridPane.getRowIndex(label);
                         int y = GridPane.getColumnIndex(label);
@@ -265,7 +267,34 @@ public class MainClass extends Application {
                             else if (value == -7) view5 = new ImageView(images.get(0));
                             else if (value == -6) {
 
-                                view5 = new ImageView(images.get(12));
+                                ObservableList<Node> childrens2 = gridpane.getChildren();
+                                realBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)] = -8;
+                                printM_ind(" ", realBoard.getBoard());
+                                for (int m2 = 0; m2 < childrens2.size(); m2++) {
+                                    result = childrens2.get(m2);
+                                    int value2 = realBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)];
+                                    Label label2 = (Label) result;
+                                    ImageView view6 = new ImageView(images.get(0));
+
+                                    if (value2 == 0) view6 = new ImageView(images.get(9));
+                                    else if (value2 == 1) view6 = new ImageView(images.get(1));
+                                    else if (value2 == 2) view6 = new ImageView(images.get(2));
+                                    else if (value2 == 3) view6 = new ImageView(images.get(3));
+                                    else if (value2 == 4) view6 = new ImageView(images.get(4));
+                                    else if (value2 == 5) view6 = new ImageView(images.get(5));
+                                    else if (value2 == 6) view6 = new ImageView(images.get(6));
+                                    else if (value2 == 7) view6 = new ImageView(images.get(7));
+                                    else if (value2 == 8) view6 = new ImageView(images.get(8));
+                                    else if (value2 == -1) view6 = new ImageView(images.get(10));
+                                    else if (value2 == -8) view6 = new ImageView(images.get(11));
+
+                                    //TODO if flag is wrong then show correct picture - Laima
+
+                                    label2.setGraphic(view6);
+
+                                }
+
+                                break;
                             }
                             label1.setGraphic(view5);
 
@@ -280,8 +309,8 @@ public class MainClass extends Application {
                             userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -3;
                             compare[0] = "question";
                         } else if (compare[0].equals("question")) {
-                            userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -7;
                             label.setGraphic(view);
+                            userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -7;
                             compare[0] = "notOpened";
                         }
                     }
