@@ -157,16 +157,23 @@ public class MainClass extends Application {
         int boardWidth = 9;
         int bombCount = 15;
         userBoard = new UserBoard(boardHeight, boardWidth);
-        realBoard = new Board(boardHeight, boardWidth);
+        setRealBoard(boardHeight,boardWidth,bombCount);
         checked = new ArrayList<>();
         bombsRightNow = 0;
         openedSquaresNow = 0;
         allFreeSpaces = boardHeight * boardWidth - bombCount;
 
+
+
+    }
+
+    private void setRealBoard(int boardHeight, int boardWidth, int bombCount){
+        realBoard = new Board(boardHeight, boardWidth);
         List<ArrayList> coordinates = realBoard.setBombCoordinates(bombCount);
 
         realBoard.setBomb(coordinates);
         realBoard.setNumbers();
+        printM_ind(" ", realBoard.getBoard());
     }
 
     private BorderPane getMainPane() {
@@ -216,9 +223,11 @@ public class MainClass extends Application {
 
     //Method to set board game tiles to board
     private void setImageToGridPane(GridPane gridpane) {
+        final boolean[] firstClick = {true};
+        final String[] compare = {"notOpened"};
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                final String[] compare = {"notOpened"};
+
 
                 Label label = new Label();
                 ImageView view = new ImageView(images.get(0));
@@ -229,8 +238,14 @@ public class MainClass extends Application {
 
                 //TODO - keyboard event and mousepressed event
                 label.setOnMousePressed(event -> {
-                    //TODO - first click is not bomb
                     if (event.isPrimaryButtonDown()) {
+                        if(firstClick[0]) {
+                            while (realBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] == -1) {
+                                setRealBoard(9,9,15);
+                            }
+                            firstClick[0] =false;
+                        }
+
                         int x = GridPane.getRowIndex(label);
                         int y = GridPane.getColumnIndex(label);
                         userBoard.getBoard()[x][y] = realBoard.getBoard()[x][y];
