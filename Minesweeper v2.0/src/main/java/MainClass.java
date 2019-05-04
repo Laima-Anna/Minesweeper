@@ -224,10 +224,9 @@ public class MainClass extends Application {
     //Method to set board game tiles to board
     private void setImageToGridPane(GridPane gridpane) {
         final boolean[] firstClick = {true};
-        final String[] compare = {"notOpened"};
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-
+                final String[] compare = {"notOpened"};
 
                 Label label = new Label();
                 ImageView view = new ImageView(images.get(0));
