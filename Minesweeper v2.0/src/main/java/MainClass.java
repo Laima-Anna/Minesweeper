@@ -164,16 +164,21 @@ public class MainClass extends Application {
         int boardWidth = 9;
         int bombCount = 15;
         userBoard = new UserBoard(boardHeight, boardWidth, bombCount);
-        realBoard = new Board(boardHeight, boardWidth, bombCount);
+        setRealBoard(boardHeight,boardWidth,bombCount);
         checked = new ArrayList<>();
         bombsRightNow = 0;
         openedSquaresNow = 0;
         allFreeSpaces = boardHeight * boardWidth - bombCount;
 
+    }
+
+    private void setRealBoard(int boardHeight, int boardWidth, int bombCount){
+        realBoard = new Board(boardHeight, boardWidth, bombCount);
         List<ArrayList> coordinates = realBoard.setBombCoordinates(bombCount);
 
         realBoard.setBomb(coordinates);
         realBoard.setNumbers();
+        printM_ind(" ", realBoard.getBoard());
     }
 
     private BorderPane getMainPane() {
@@ -231,10 +236,18 @@ public class MainClass extends Application {
         return images;
     }
 
+    void checkFlags(){
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if(userBoard.getBoard()[i][j]==-5&&realBoard.getBoard()[i][j]!=-1) realBoard.getBoard()[i][j]=-5;
+            }
+        }
+    }
+
     //Method to set board game tiles to board
     private void setImageToGridPane(GridPane gridpane) {
         final int[] bombsMarked = {0};
-
+        final boolean[] firstClick = {true};
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 final String[] compare = {"notOpened"};
@@ -248,8 +261,14 @@ public class MainClass extends Application {
 
                 //TODO - keyboard event and mousepressed event
                 label.setOnMousePressed(event -> {
-                    //TODO - first click is not bomb
                     if (event.isPrimaryButtonDown()) {
+                        if(firstClick[0]) {
+                            while (realBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] == -1) {
+                                setRealBoard(9,9,15);
+                            }
+                            firstClick[0] =false;
+                        }
+
                         int x = GridPane.getRowIndex(label);
                         int y = GridPane.getColumnIndex(label);
                         userBoard.getBoard()[x][y] = realBoard.getBoard()[x][y];
@@ -266,6 +285,7 @@ public class MainClass extends Application {
                         ObservableList<Node> childrens = gridpane.getChildren();
 
                         printM_ind(" ", userBoard.getBoard());
+                        printM_ind(" ", realBoard.getBoard());
                         for (int m = 0; m < childrens.size(); m++) {
                             result = childrens.get(m);
                             int value = userBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)];
@@ -290,7 +310,8 @@ public class MainClass extends Application {
 
                                 ObservableList<Node> childrens2 = gridpane.getChildren();
                                 realBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)] = -8;
-                                printM_ind(" ", realBoard.getBoard());
+                                checkFlags();
+
                                 for (int m2 = 0; m2 < childrens2.size(); m2++) {
                                     result = childrens2.get(m2);
                                     int value2 = realBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)];
@@ -308,8 +329,8 @@ public class MainClass extends Application {
                                     else if (value2 == 8) view6 = new ImageView(images.get(8));
                                     else if (value2 == -1) view6 = new ImageView(images.get(10));
                                     else if (value2 == -8) view6 = new ImageView(images.get(11));
+                                    else if (value2 == -5) view6 = new ImageView(images.get(12));
 
-                                    //TODO if flag is wrong then show correct picture - Laima
 
                                     label2.setGraphic(view6);
                                 }
@@ -343,7 +364,7 @@ public class MainClass extends Application {
                         clock.stop();
                     }
 
-                    event.consume();
+                    //event.consume();
                 });
             }
         }
