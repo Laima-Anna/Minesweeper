@@ -1,6 +1,6 @@
 public class UserBoard extends Board{
-    public UserBoard(int boardHeight, int boardWidth) {
-        super(boardHeight, boardWidth);
+    public UserBoard(int boardHeight, int boardWidth, int bombCount) {
+        super(boardHeight, boardWidth, bombCount);
         board = generateBoard();
     }
 

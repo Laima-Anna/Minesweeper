@@ -1,3 +1,4 @@
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -22,6 +23,8 @@ public class MainClass extends Application {
     private int openedSquaresNow;
     private List<List<Integer>> checked;
     private int allFreeSpaces;
+    private BorderPane top;
+    private AnimationTimer clock;
 
     public static void main(String[] args) {
         launch(args);
@@ -143,21 +146,25 @@ public class MainClass extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        startGame();
+
         BorderPane root = getMainPane();
+
+        addBombCounter(0);
+        clock = addTimeCounter();
+        clock.start();
 
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
-
-        startGame();
     }
 
     private void startGame() {
         int boardHeight = 9;
         int boardWidth = 9;
         int bombCount = 15;
-        userBoard = new UserBoard(boardHeight, boardWidth);
-        realBoard = new Board(boardHeight, boardWidth);
+        userBoard = new UserBoard(boardHeight, boardWidth, bombCount);
+        realBoard = new Board(boardHeight, boardWidth, bombCount);
         checked = new ArrayList<>();
         bombsRightNow = 0;
         openedSquaresNow = 0;
@@ -171,9 +178,9 @@ public class MainClass extends Application {
 
     private BorderPane getMainPane() {
         BorderPane pane = new BorderPane();
-        BorderPane other = this.getBorderPane();
+        top = this.getBorderPane();
         GridPane another = this.getGridPane();
-        pane.setTop(other);
+        pane.setTop(top);
         pane.setCenter(another);
         return pane;
     }
@@ -186,8 +193,6 @@ public class MainClass extends Application {
 
     private BorderPane getBorderPane() {
         BorderPane borderpane = new BorderPane();
-        Label label1 = new Label("tere");
-        borderpane.setTop(label1);
         return borderpane;
     }
 
@@ -210,12 +215,26 @@ public class MainClass extends Application {
         images.add(new Image("File:images/Flag.png"));
         images.add(new Image("File:images/Question.png"));
         images.add(new Image("File:images/SelectedQuestion.png"));
+        images.add(new Image("File:images/0.png"));
+        images.add(new Image("File:images/1.png"));
+        images.add(new Image("File:images/2.png"));
+        images.add(new Image("File:images/3.png"));
+        images.add(new Image("File:images/4.png"));
+        images.add(new Image("File:images/5.png"));
+        images.add(new Image("File:images/6.png"));
+        images.add(new Image("File:images/7.png"));
+        images.add(new Image("File:images/8.png"));
+        images.add(new Image("File:images/9.png"));
+        images.add(new Image("File:images/Counter.png"));
+        images.add(new Image("File:images/Minus.png"));
 
         return images;
     }
 
     //Method to set board game tiles to board
     private void setImageToGridPane(GridPane gridpane) {
+        final int[] bombsMarked = {0};
+
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 final String[] compare = {"notOpened"};
@@ -267,6 +286,8 @@ public class MainClass extends Application {
                             else if (value == -7) view5 = new ImageView(images.get(0));
                             else if (value == -6) {
 
+                                clock.stop();
+
                                 ObservableList<Node> childrens2 = gridpane.getChildren();
                                 realBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)] = -8;
                                 printM_ind(" ", realBoard.getBoard());
@@ -291,7 +312,6 @@ public class MainClass extends Application {
                                     //TODO if flag is wrong then show correct picture - Laima
 
                                     label2.setGraphic(view6);
-
                                 }
 
                                 break;
@@ -304,26 +324,109 @@ public class MainClass extends Application {
                             label.setGraphic(view2);
                             userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -5;
                             compare[0] = "flag";
+                            bombsMarked[0]++;
                         } else if (compare[0].equals("flag")) {
                             label.setGraphic(view3);
                             userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -3;
                             compare[0] = "question";
+                            bombsMarked[0]--;
                         } else if (compare[0].equals("question")) {
                             label.setGraphic(view);
                             userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -7;
                             compare[0] = "notOpened";
                         }
+                        addBombCounter(bombsMarked[0]);
                     }
 
                     if (openedSquaresNow == allFreeSpaces) { //if there is the same number of opened squares as originally planned
                         System.out.println("You won!");
+                        clock.stop();
                     }
 
                     event.consume();
                 });
-
-
             }
         }
+    }
+    //Method that counts flagged bombs on the board
+    private void addBombCounter(int bombsMarked) {
+        BorderPane bp = new BorderPane();
+
+        int allBombs = realBoard.getBombCount();
+        int bombsLeft = allBombs - bombsMarked;
+        String bombs = String.valueOf(bombsLeft);
+
+        top.setLeft(setImagesToCounters(bombs, bp));
+    }
+
+    //matches integers with the correct picture for counters
+    private ImageView counterImages(int a) {
+        ImageView view = new ImageView(images.get(16));
+        if (a == 1) view = new ImageView(images.get(17));
+        else if (a == 2) view = new ImageView(images.get(18));
+        else if (a == 3) view = new ImageView(images.get(19));
+        else if (a == 4) view = new ImageView(images.get(20));
+        else if (a == 5) view = new ImageView(images.get(21));
+        else if (a == 6) view = new ImageView(images.get(22));
+        else if (a == 7) view = new ImageView(images.get(23));
+        else if (a == 8) view = new ImageView(images.get(24));
+        else if (a == 9) view = new ImageView(images.get(25));
+        return view;
+    }
+
+    //sets correct images to the counters
+    private BorderPane setImagesToCounters(String numbers, BorderPane bp) {
+        ImageView viewCounter = new ImageView(images.get(26));
+        bp.getChildren().add(viewCounter);
+
+        ImageView viewZero = new ImageView(images.get(16));
+
+        for (int i = 0; i < numbers.length(); i++) {
+            ImageView view;
+            if (numbers.charAt(i) == '-') {
+                view = new ImageView(images.get(27));
+            } else {
+                int a = Integer.parseInt("" + numbers.charAt(i));
+                view = counterImages(a);
+            }
+
+            if (numbers.length() == 3) {
+                if (i == 0) bp.setLeft(view);
+                else if (i == 1) bp.setCenter(view);
+                else bp.setRight(view);
+            } else if (numbers.length() == 2) {
+                if (i == 0) bp.setCenter(view);
+                else if (i == 1) bp.setRight(view);
+            } else if (numbers.length() == 1) {
+                bp.setCenter(viewZero);
+                bp.setRight(view);
+            }
+        }
+        return bp;
+    }
+
+    //adds elapsed time counter to top right
+    private AnimationTimer addTimeCounter() {
+        long startTime = System.currentTimeMillis();
+        BorderPane timeCounter = new BorderPane();
+
+        AnimationTimer timer = new AnimationTimer() {
+            String time;
+
+            @Override
+            public void handle(long now) {
+
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                time = Long.toString(elapsedTime / 1000);
+
+                top.setRight(setImagesToCounters(time, timeCounter));
+            }
+
+            @Override
+            public String toString() {
+                return time;
+            }
+        };
+        return timer;
     }
 }

@@ -6,16 +6,22 @@ public class Board {
     int boardHeight;
     int[][] board;
     private List<ArrayList> bombCoordinates;
+    int bombCount;
 
-    Board(int boardHeight, int boardWidth) {
+    Board(int boardHeight, int boardWidth, int bombCount) {
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
         board = generateBoard();
         bombCoordinates = new ArrayList<>();
+        this.bombCount = bombCount;
     }
 
     public int[][] getBoard() {
         return board;
+    }
+
+    public int getBombCount() {
+        return bombCount;
     }
 
     private int[][] generateBoard() {
