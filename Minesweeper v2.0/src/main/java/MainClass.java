@@ -3,7 +3,7 @@ import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -144,17 +144,53 @@ public class MainClass extends Application {
 
     }
 
+    MenuBar getMenuBar(){
+        Menu menu1 = new Menu("Game");
+        Menu menu2 = new Menu("Help");
+        Menu subMenu = new Menu("Levels");
+        MenuItem menuItem1 = new MenuItem("New");
+        RadioMenuItem choice1Item = new RadioMenuItem("Beginner");
+        RadioMenuItem choice2Item = new RadioMenuItem("Intermediate");
+        RadioMenuItem choice3Item = new RadioMenuItem("Expert");
+        ToggleGroup toggleGroup = new ToggleGroup();
+        toggleGroup.getToggles().add(choice1Item);
+        toggleGroup.getToggles().add(choice2Item);
+        toggleGroup.getToggles().add(choice3Item);
+        MenuItem menuItem5 = new MenuItem("High scores");
+        MenuItem menuItem6 = new MenuItem("Exit");
+
+        subMenu.getItems().addAll(choice1Item,choice2Item,choice3Item);
+        menu1.getItems().addAll(menuItem1,subMenu,menuItem5,menuItem6);
+
+        MenuItem menuItem2 = new MenuItem("How to");
+        MenuItem menuItem3 = new MenuItem("About");
+        menu2.getItems().addAll(menuItem2,menuItem3);
+
+        MenuBar menuBar = new MenuBar();
+        menuBar.getMenus().addAll(menu1,menu2);
+
+        return menuBar;
+    }
+
     @Override
     public void start(Stage primaryStage) {
         startGame();
 
-        BorderPane root = getMainPane();
+        BorderPane root = new BorderPane();
+        BorderPane root2 = getMainPane();
 
         addBombCounter(0);
+
+        MenuBar menuBar = getMenuBar();
+
+        root.setTop(menuBar);
+        root.setCenter(root2);
 
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+
     }
 
     private void startGame() {
