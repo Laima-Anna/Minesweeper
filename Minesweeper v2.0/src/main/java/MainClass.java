@@ -381,6 +381,8 @@ public class MainClass extends Application {
     //Method that adds flagged bomb counter to the left
     private void addBombCounter(int bombsMarked) {
         BorderPane bp = new BorderPane();
+        ImageView viewCounter = new ImageView(images.get(26));
+        bp.getChildren().add(viewCounter);
 
         int allBombs = realBoard.getBombCount();
         int bombsLeft = allBombs - bombsMarked;
@@ -421,9 +423,15 @@ public class MainClass extends Application {
                 else if (i == 1) bp.setCenter(view);
                 else bp.setRight(view);
             } else if (numbers.length() == 2) {
-                bp.setLeft(new ImageView(images.get(16)));
-                if (i == 0) bp.setCenter(view);
-                else if (i == 1) bp.setRight(view);
+                if(numbers.charAt(0) == '-') {
+                    if (i == 0) bp.setCenter(view);
+                    else if (i == 1) bp.setRight(view);
+                }
+                else {
+                    bp.setLeft(new ImageView(images.get(16)));
+                    if (i == 0) bp.setCenter(view);
+                    else if (i == 1) bp.setRight(view);
+                }
             } else if (numbers.length() == 1) {
                 bp.setLeft(new ImageView(images.get(16)));
                 bp.setCenter(new ImageView(images.get(16)));
