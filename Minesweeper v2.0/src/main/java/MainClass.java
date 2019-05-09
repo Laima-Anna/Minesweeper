@@ -16,7 +16,6 @@ import java.util.List;
 public class MainClass extends Application {
 
     private List<Image> images = getImages();
-
     private UserBoard userBoard;
     private Board realBoard;
     private int openedSquaresNow;
@@ -24,6 +23,9 @@ public class MainClass extends Application {
     private int allFreeSpaces;
     private BorderPane top;
     private AnimationTimer clock;
+    private int boardHeight;
+    private int boardWidth;
+    private int bombCount;
 
     public static void main(String[] args) {
         launch(args);
@@ -140,7 +142,6 @@ public class MainClass extends Application {
             System.out.print(var13 + toStringJ(var1[var4], var2, " "));
             System.out.println();
         }
-
     }
 
     MenuBar getMenuBar(){
@@ -193,18 +194,18 @@ public class MainClass extends Application {
     }
 
     private void startGame() {
-        int boardHeight = 9;
-        int boardWidth = 9;
-        int bombCount = 15;
+        boardHeight = 9;
+        boardWidth = 9;
+        bombCount = 15;
         userBoard = new UserBoard(boardHeight, boardWidth, bombCount);
-        setRealBoard(boardHeight,boardWidth,bombCount);
+        setRealBoard(boardHeight, boardWidth, bombCount);
         checked = new ArrayList<>();
         openedSquaresNow = 0;
         allFreeSpaces = boardHeight * boardWidth - bombCount;
 
     }
 
-    private void setRealBoard(int boardHeight, int boardWidth, int bombCount){
+    private void setRealBoard(int boardHeight, int boardWidth, int bombCount) {
         realBoard = new Board(boardHeight, boardWidth, bombCount);
         List<ArrayList> coordinates = realBoard.setBombCoordinates(bombCount);
 
@@ -276,10 +277,11 @@ public class MainClass extends Application {
         return images;
     }
 
-    void checkFlags(){
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if(userBoard.getBoard()[i][j]==-5&&realBoard.getBoard()[i][j]!=-1) realBoard.getBoard()[i][j]=-5;
+    void checkFlags() {
+        for (int i = 0; i < boardHeight; i++) {
+            for (int j = 0; j < boardWidth; j++) {
+                if (userBoard.getBoard()[i][j] == -5 && realBoard.getBoard()[i][j] != -1)
+                    realBoard.getBoard()[i][j] = -5;
             }
         }
     }
@@ -288,8 +290,8 @@ public class MainClass extends Application {
     private void setImageToGridPane(GridPane gridpane) {
         final int[] bombsMarked = {0};
         final boolean[] firstClick = {true};
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
+        for (int i = 0; i < boardHeight; i++) {
+            for (int j = 0; j < boardWidth; j++) {
                 final String[] compare = {"notOpened"};
 
                 Label label = new Label();
@@ -302,14 +304,14 @@ public class MainClass extends Application {
                 //TODO - keyboard event and mousepressed event
                 label.setOnMousePressed(event -> {
                     if (event.isPrimaryButtonDown()) {
-                        if(firstClick[0]) {
+                        if (firstClick[0]) {
                             //time starts counting when first square is opened
                             clock = addTimeCounter();
                             clock.start();
                             while (realBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] == -1) {
-                                setRealBoard(9,9,15);
+                                setRealBoard(boardHeight, boardWidth, bombCount);
                             }
-                            firstClick[0] =false;
+                            firstClick[0] = false;
                         }
 
                         int x = GridPane.getRowIndex(label);
@@ -374,7 +376,6 @@ public class MainClass extends Application {
                                     else if (value2 == -8) view6 = new ImageView(images.get(11));
                                     else if (value2 == -5) view6 = new ImageView(images.get(12));
 
-
                                     label2.setGraphic(view6);
                                 }
 
@@ -412,6 +413,7 @@ public class MainClass extends Application {
             }
         }
     }
+
     //Method that adds flagged bomb counter to the left
     private void addBombCounter(int bombsMarked) {
         BorderPane bp = new BorderPane();
@@ -457,11 +459,10 @@ public class MainClass extends Application {
                 else if (i == 1) bp.setCenter(view);
                 else bp.setRight(view);
             } else if (numbers.length() == 2) {
-                if(numbers.charAt(0) == '-') {
+                if (numbers.charAt(0) == '-') {
                     if (i == 0) bp.setCenter(view);
                     else if (i == 1) bp.setRight(view);
-                }
-                else {
+                } else {
                     bp.setLeft(new ImageView(images.get(16)));
                     if (i == 0) bp.setCenter(view);
                     else if (i == 1) bp.setRight(view);
@@ -488,7 +489,7 @@ public class MainClass extends Application {
 
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 time = Long.toString(elapsedTime / 1000);
-                if(Integer.parseInt(time) == 999)  this.stop();
+                if (Integer.parseInt(time) == 999) this.stop();
 
                 top.setRight(setImagesToCounters(time, timeCounter));
             }
