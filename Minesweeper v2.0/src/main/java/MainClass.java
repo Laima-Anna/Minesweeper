@@ -151,8 +151,6 @@ public class MainClass extends Application {
         BorderPane root = getMainPane();
 
         addBombCounter(0);
-        clock = addTimeCounter();
-        clock.start();
 
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
@@ -198,6 +196,14 @@ public class MainClass extends Application {
 
     private BorderPane getBorderPane() {
         BorderPane borderpane = new BorderPane();
+        //adds borderpane to the right, where time counter will be placed
+        BorderPane counter = new BorderPane();
+        borderpane.setRight(counter);
+
+        //adds three zeroes to the time counter
+        counter.setLeft(new ImageView(images.get(16)));
+        counter.setCenter(new ImageView(images.get(16)));
+        counter.setRight(new ImageView(images.get(16)));
         return borderpane;
     }
 
@@ -263,6 +269,9 @@ public class MainClass extends Application {
                 label.setOnMousePressed(event -> {
                     if (event.isPrimaryButtonDown()) {
                         if(firstClick[0]) {
+                            //time starts counting when first square is opened
+                            clock = addTimeCounter();
+                            clock.start();
                             while (realBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] == -1) {
                                 setRealBoard(9,9,15);
                             }
@@ -369,7 +378,7 @@ public class MainClass extends Application {
             }
         }
     }
-    //Method that counts flagged bombs on the board
+    //Method that adds flagged bomb counter to the left
     private void addBombCounter(int bombsMarked) {
         BorderPane bp = new BorderPane();
 
@@ -397,10 +406,6 @@ public class MainClass extends Application {
 
     //sets correct images to the counters
     private BorderPane setImagesToCounters(String numbers, BorderPane bp) {
-        ImageView viewCounter = new ImageView(images.get(26));
-        bp.getChildren().add(viewCounter);
-
-        ImageView viewZero = new ImageView(images.get(16));
 
         for (int i = 0; i < numbers.length(); i++) {
             ImageView view;
@@ -416,10 +421,12 @@ public class MainClass extends Application {
                 else if (i == 1) bp.setCenter(view);
                 else bp.setRight(view);
             } else if (numbers.length() == 2) {
+                bp.setLeft(new ImageView(images.get(16)));
                 if (i == 0) bp.setCenter(view);
                 else if (i == 1) bp.setRight(view);
             } else if (numbers.length() == 1) {
-                bp.setCenter(viewZero);
+                bp.setLeft(new ImageView(images.get(16)));
+                bp.setCenter(new ImageView(images.get(16)));
                 bp.setRight(view);
             }
         }
@@ -439,6 +446,7 @@ public class MainClass extends Application {
 
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 time = Long.toString(elapsedTime / 1000);
+                if(Integer.parseInt(time) == 999)  this.stop();
 
                 top.setRight(setImagesToCounters(time, timeCounter));
             }
