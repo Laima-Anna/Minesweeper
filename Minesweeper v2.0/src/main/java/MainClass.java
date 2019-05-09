@@ -15,11 +15,10 @@ import java.util.List;
 
 public class MainClass extends Application {
 
-    List<Image> images = getImages();
+    private List<Image> images = getImages();
 
     private UserBoard userBoard;
     private Board realBoard;
-    private int bombsRightNow;
     private int openedSquaresNow;
     private List<List<Integer>> checked;
     private int allFreeSpaces;
@@ -200,7 +199,6 @@ public class MainClass extends Application {
         userBoard = new UserBoard(boardHeight, boardWidth, bombCount);
         setRealBoard(boardHeight,boardWidth,bombCount);
         checked = new ArrayList<>();
-        bombsRightNow = 0;
         openedSquaresNow = 0;
         allFreeSpaces = boardHeight * boardWidth - bombCount;
 
