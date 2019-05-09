@@ -1,16 +1,17 @@
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class MainClass extends Application {
     private int boardHeight;
     private int boardWidth;
     private int bombCount;
+    private Stage stage;
 
     public static void main(String[] args) {
         launch(args);
@@ -93,6 +95,36 @@ public class MainClass extends Application {
         if (numbers[7] == 0 && !checked.contains(uus9)) openAround(x + 1, y + 1, userBoard, realBoard, checked);
     }
 
+    @Override
+    public void start(Stage primaryStage) {
+        this.stage = new Stage();
+
+        //Program is started by default with beginner mode
+        generateGame(9, 9, 10);
+    }
+
+    //Sets up all the necessary elements to display game board
+    private void generateGame(int height, int width, int bombcount) {
+
+        startGame(height, width, bombcount);
+
+        BorderPane root = new BorderPane();
+        BorderPane root2 = getMainPane();
+
+        addBombCounter(0);
+
+        MenuBar menuBar = getMenuBar();
+
+        root.setTop(menuBar);
+        root.setCenter(root2);
+
+        Scene scene = new Scene(root);
+
+        stage.setScene(scene);
+        stage.show();
+        stage.centerOnScreen();
+    }
+
     public static String toStringJ(int[] var0, int var1, String var2) {
         String var3 = "";
         String var4 = "%" + var1 + "d";
@@ -147,34 +179,43 @@ public class MainClass extends Application {
         }
     }
 
-    MenuBar getMenuBar(){
+    private MenuBar getMenuBar() {
         Menu menu1 = new Menu("Game");
         Menu menu2 = new Menu("Help");
         Menu subMenu = new Menu("Levels");
         MenuItem menuItem1 = new MenuItem("New");
         menuItem1.setAccelerator(KeyCombination.keyCombination("N"));
         menuItem1.setOnAction(e -> {
-            System.out.println("Menu Item 1 Selected");
+            //if new is selected, a new game is generated using the current board parameters
+            clock.stop();
+            generateGame(boardHeight, boardWidth, bombCount);
         });
         RadioMenuItem choice1Item = new RadioMenuItem("Beginner");
         choice1Item.setAccelerator(KeyCombination.keyCombination("B"));
         choice1Item.setOnAction(e -> {
-            System.out.println("Menu Item 1 Selected");
+            clock.stop();
+            generateGame(9, 9, 10);
         });
         RadioMenuItem choice2Item = new RadioMenuItem("Intermediate");
         choice2Item.setAccelerator(KeyCombination.keyCombination("I"));
         choice2Item.setOnAction(e -> {
-            System.out.println("Menu Item 1 Selected");
+            clock.stop();
+            generateGame(16, 16, 40);
         });
         RadioMenuItem choice3Item = new RadioMenuItem("Expert");
         choice3Item.setAccelerator(KeyCombination.keyCombination("E"));
         choice3Item.setOnAction(e -> {
-            System.out.println("Menu Item 1 Selected");
+            clock.stop();
+            generateGame(16, 30, 99);
+        });
+        RadioMenuItem choice4Item = new RadioMenuItem("Custom");
+        choice4Item.setAccelerator(KeyCombination.keyCombination("C"));
+        choice4Item.setOnAction(e -> {
+            generateCustomBoard();
         });
         ToggleGroup toggleGroup = new ToggleGroup();
-        toggleGroup.getToggles().add(choice1Item);
-        toggleGroup.getToggles().add(choice2Item);
-        toggleGroup.getToggles().add(choice3Item);
+        toggleGroup.getToggles().addAll(choice1Item, choice2Item, choice3Item, choice4Item);
+
         MenuItem menuItem5 = new MenuItem("High scores");
         menuItem5.setAccelerator(KeyCombination.keyCombination("H"));
         menuItem5.setOnAction(e -> {
@@ -183,11 +224,11 @@ public class MainClass extends Application {
         MenuItem menuItem6 = new MenuItem("Exit");
         menuItem6.setAccelerator(KeyCombination.keyCombination("Q"));
         menuItem6.setOnAction(e -> {
-            System.out.println("Menu Item 1 Selected");
+            stage.close();
         });
 
-        subMenu.getItems().addAll(choice1Item,choice2Item,choice3Item);
-        menu1.getItems().addAll(menuItem1,subMenu,menuItem5,menuItem6);
+        subMenu.getItems().addAll(choice1Item, choice2Item, choice3Item, choice4Item);
+        menu1.getItems().addAll(menuItem1, subMenu, menuItem5, menuItem6);
 
         MenuItem menuItem2 = new MenuItem("How to");
         menuItem2.setOnAction(e -> {
@@ -197,39 +238,112 @@ public class MainClass extends Application {
         menuItem3.setOnAction(e -> {
             System.out.println("Menu Item 1 Selected");
         });
-        menu2.getItems().addAll(menuItem2,menuItem3);
+        menu2.getItems().addAll(menuItem2, menuItem3);
 
         MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().addAll(menu1,menu2);
+        menuBar.getMenus().addAll(menu1, menu2);
 
         return menuBar;
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-        startGame();
+    //Method that shows a separate window where you can input custom board measurements
+    private void generateCustomBoard() {
+        Stage custom = new Stage();
 
-        BorderPane root = new BorderPane();
-        BorderPane root2 = getMainPane();
+        Label height = new Label("Height: ");
+        Label width = new Label("Width: ");
+        Label mines = new Label("Mines: ");
 
-        addBombCounter(0);
+        VBox vbox = new VBox(10, height, width, mines);
+        vbox.setPadding(new Insets(20, 10, 20, 20));
 
-        MenuBar menuBar = getMenuBar();
+        TextField heightField = new TextField();
+        heightField.setPrefWidth(40);
+        TextField widthField = new TextField();
+        widthField.setPrefWidth(40);
+        TextField minesField = new TextField();
+        minesField.setPrefWidth(40);
 
-        root.setTop(menuBar);
-        root.setCenter(root2);
+        VBox vbox2 = new VBox(heightField, widthField, minesField);
+        vbox2.setPadding(new Insets(20, 20, 20, 10));
 
-        Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Button okButton = new Button("OK");
+        okButton.setMinWidth(50);
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setMinWidth(50);
 
+        VBox vbox3 = new VBox(okButton, cancelButton);
+        vbox3.setPadding(new Insets(20, 20, 20, 10));
+
+        HBox hbox = new HBox();
+
+        hbox.getChildren().addAll(vbox, vbox2, vbox3);
+
+        Scene scene = new Scene(hbox);
+
+        custom.setScene(scene);
+        custom.show();
+
+        cancelButton.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown()) {
+                custom.close();
+            }
+        });
+
+        final int[] x = new int[1];
+        final int[] y = new int[1];
+        final int[] bombs = new int[1];
+
+        okButton.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown()) {
+                clock.stop();
+
+                //if textfield values are not numeric, then use current boardheight and boardwidth and bombcount of 10
+                if (isNumeric(heightField.getText())) x[0] = Integer.parseInt(heightField.getText());
+                else x[0] = boardHeight;
+
+                if (isNumeric(widthField.getText())) y[0] = Integer.parseInt(widthField.getText());
+                else y[0] = boardWidth;
+
+                if (isNumeric(minesField.getText())) bombs[0] = Integer.parseInt(minesField.getText());
+                else bombs[0] = 10;
+
+                //minimum height is 9 squares and maximum height 18
+                if (x[0] < 9) x[0] = 9;
+                else if (x[0] > 18) x[0] = 18;
+
+                //minimum width is 9 squares and maximum width 35
+                if (y[0] < 9) y[0] = 9;
+                else if (y[0] > 35) y[0] = 35;
+
+                //minimum bombcount is 10, maximum is the number of squares on the board minus 20
+                if (bombs[0] < 10) bombs[0] = 10;
+                else if (bombs[0] > (x[0] * y[0] - 20)) bombs[0] = (x[0] * y[0] - 20);
+
+            }
+            generateGame(x[0], y[0], bombs[0]);
+            custom.close();
+        });
 
     }
 
-    private void startGame() {
-        boardHeight = 9;
-        boardWidth = 9;
-        bombCount = 15;
+    private static boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private void startGame(int height, int width, int bombcount) {
+        //AnimationTimer needs to be initialized in the beginning, so we can use the variable immediately
+        clock = addTimeCounter();
+        clock.stop();
+
+        this.boardHeight = height;
+        this.boardWidth = width;
+        this.bombCount = bombcount;
         userBoard = new UserBoard(boardHeight, boardWidth, bombCount);
         setRealBoard(boardHeight, boardWidth, bombCount);
         checked = new ArrayList<>();
@@ -250,6 +364,7 @@ public class MainClass extends Application {
     private BorderPane getMainPane() {
         BorderPane pane = new BorderPane();
         top = this.getBorderPane();
+        top.setStyle("-fx-background-color: #bdbdbd;");
         GridPane another = this.getGridPane();
         pane.setTop(top);
         pane.setCenter(another);
@@ -268,7 +383,7 @@ public class MainClass extends Application {
         BorderPane counter = new BorderPane();
         borderpane.setRight(counter);
 
-        //adds three zeroes to the time counter
+        //shows three zeroes when board has been generated
         counter.setLeft(new ImageView(images.get(16)));
         counter.setCenter(new ImageView(images.get(16)));
         counter.setRight(new ImageView(images.get(16)));
@@ -323,8 +438,8 @@ public class MainClass extends Application {
     private void setImageToGridPane(GridPane gridpane) {
         final int[] bombsMarked = {0};
         final boolean[] firstClick = {true};
-        for (int i = 0; i < boardHeight; i++) {
-            for (int j = 0; j < boardWidth; j++) {
+        for (int i = 0; i < boardWidth; i++) {
+            for (int j = 0; j < boardHeight; j++) {
                 final String[] compare = {"notOpened"};
 
                 Label label = new Label();
@@ -487,20 +602,27 @@ public class MainClass extends Application {
                 view = counterImages(a);
             }
 
+            //if number is 3 digits long, sets image views either to the left, center or right
             if (numbers.length() == 3) {
                 if (i == 0) bp.setLeft(view);
                 else if (i == 1) bp.setCenter(view);
                 else bp.setRight(view);
-            } else if (numbers.length() == 2) {
+            }
+            //if number is 2 digits long
+            else if (numbers.length() == 2) {
+                //if nr is negative, don't show 0 on the left
                 if (numbers.charAt(0) == '-') {
                     if (i == 0) bp.setCenter(view);
                     else if (i == 1) bp.setRight(view);
                 } else {
+                    //first digit is zero
                     bp.setLeft(new ImageView(images.get(16)));
                     if (i == 0) bp.setCenter(view);
                     else if (i == 1) bp.setRight(view);
                 }
-            } else if (numbers.length() == 1) {
+            }
+            //if number is 1 digit long, the first two numbers shown are both zeroes
+            else if (numbers.length() == 1) {
                 bp.setLeft(new ImageView(images.get(16)));
                 bp.setCenter(new ImageView(images.get(16)));
                 bp.setRight(view);
