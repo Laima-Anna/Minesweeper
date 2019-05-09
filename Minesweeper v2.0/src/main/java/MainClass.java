@@ -6,6 +6,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -149,21 +152,51 @@ public class MainClass extends Application {
         Menu menu2 = new Menu("Help");
         Menu subMenu = new Menu("Levels");
         MenuItem menuItem1 = new MenuItem("New");
+        menuItem1.setAccelerator(KeyCombination.keyCombination("N"));
+        menuItem1.setOnAction(e -> {
+            System.out.println("Menu Item 1 Selected");
+        });
         RadioMenuItem choice1Item = new RadioMenuItem("Beginner");
+        choice1Item.setAccelerator(KeyCombination.keyCombination("B"));
+        choice1Item.setOnAction(e -> {
+            System.out.println("Menu Item 1 Selected");
+        });
         RadioMenuItem choice2Item = new RadioMenuItem("Intermediate");
+        choice2Item.setAccelerator(KeyCombination.keyCombination("I"));
+        choice2Item.setOnAction(e -> {
+            System.out.println("Menu Item 1 Selected");
+        });
         RadioMenuItem choice3Item = new RadioMenuItem("Expert");
+        choice3Item.setAccelerator(KeyCombination.keyCombination("E"));
+        choice3Item.setOnAction(e -> {
+            System.out.println("Menu Item 1 Selected");
+        });
         ToggleGroup toggleGroup = new ToggleGroup();
         toggleGroup.getToggles().add(choice1Item);
         toggleGroup.getToggles().add(choice2Item);
         toggleGroup.getToggles().add(choice3Item);
         MenuItem menuItem5 = new MenuItem("High scores");
+        menuItem5.setAccelerator(KeyCombination.keyCombination("H"));
+        menuItem5.setOnAction(e -> {
+            System.out.println("Menu Item 1 Selected");
+        });
         MenuItem menuItem6 = new MenuItem("Exit");
+        menuItem6.setAccelerator(KeyCombination.keyCombination("Q"));
+        menuItem6.setOnAction(e -> {
+            System.out.println("Menu Item 1 Selected");
+        });
 
         subMenu.getItems().addAll(choice1Item,choice2Item,choice3Item);
         menu1.getItems().addAll(menuItem1,subMenu,menuItem5,menuItem6);
 
         MenuItem menuItem2 = new MenuItem("How to");
+        menuItem2.setOnAction(e -> {
+            System.out.println("Menu Item 1 Selected");
+        });
         MenuItem menuItem3 = new MenuItem("About");
+        menuItem3.setOnAction(e -> {
+            System.out.println("Menu Item 1 Selected");
+        });
         menu2.getItems().addAll(menuItem2,menuItem3);
 
         MenuBar menuBar = new MenuBar();
@@ -301,7 +334,7 @@ public class MainClass extends Application {
                 label.setGraphic(view);
                 gridpane.add(label, i, j);
 
-                //TODO - keyboard event and mousepressed event
+                //TODO - keyboard event  and mousepressed event
                 label.setOnMousePressed(event -> {
                     if (event.isPrimaryButtonDown()) {
                         if (firstClick[0]) {
