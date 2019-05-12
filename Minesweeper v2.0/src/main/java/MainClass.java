@@ -120,27 +120,17 @@ public class MainClass extends Application {
         });
         RadioMenuItem choice4Item = new RadioMenuItem("Custom");
         choice4Item.setAccelerator(KeyCombination.keyCombination("C"));
-        choice4Item.setOnAction(e -> {
-            generateCustomBoard();
-        });
+        choice4Item.setOnAction(e -> generateCustomBoard());
         ToggleGroup toggleGroup = new ToggleGroup();
         toggleGroup.getToggles().addAll(choice1Item, choice2Item, choice3Item, choice4Item);
 
         MenuItem menuItem5 = new MenuItem("High scores");
         menuItem5.setAccelerator(KeyCombination.keyCombination("H"));
-        menuItem5.setOnAction(e -> {
-            BorderPane root = new BorderPane();
-            Stage stage = new Stage();
-            stage.setTitle("High scores");
-            stage.setScene(new Scene(root, 400, 200));
-            stage.show();
+        menuItem5.setOnAction(e -> getHighScoreWindow());
 
-        });
         MenuItem menuItem6 = new MenuItem("Exit");
         menuItem6.setAccelerator(KeyCombination.keyCombination("Q"));
-        menuItem6.setOnAction(e -> {
-            stage.close();
-        });
+        menuItem6.setOnAction(e -> stage.close());
 
         subMenu.getItems().addAll(choice1Item, choice2Item, choice3Item, choice4Item);
         menu1.getItems().addAll(menuItem1, subMenu, menuItem5, menuItem6);
@@ -148,10 +138,12 @@ public class MainClass extends Application {
         MenuItem menuItem2 = new MenuItem("How to");
         menuItem2.setOnAction(e -> {
             System.out.println("Menu Item 1 Selected");
+            System.out.println();
         });
         MenuItem menuItem3 = new MenuItem("About");
         menuItem3.setOnAction(e -> {
             System.out.println("Menu Item 1 Selected");
+            System.out.println();
         });
         menu2.getItems().addAll(menuItem2, menuItem3);
 
@@ -159,6 +151,87 @@ public class MainClass extends Application {
         menuBar.getMenus().addAll(menu1, menu2);
 
         return menuBar;
+    }
+
+    private void getHighScoreWindow(){
+        Stage stage = new Stage();
+        stage.setMinHeight(200);
+        stage.setMinWidth(300);
+        stage.setMaxHeight(300);
+        stage.setMaxWidth(500);
+        stage.setTitle("High Scores");
+
+        String[] line1 = highScores.get("beginner").split(";");
+        String[] line2 = highScores.get("intermediate").split(";");
+        String[] line3 = highScores.get("expert").split(";");
+
+        VBox vbox = new VBox(10, new Label("Beginner: "),new Label("Intermediate: "),new Label("Expert: "));
+        VBox vbox2 = new VBox(10,new Label(line1[0]),new Label(line2[0]),new Label(line3[0]));
+        VBox vbox3 = new VBox(10,new Label(line1[1]),new Label(line2[1]),new Label(line3[1]));
+        HBox hbox = new HBox(vbox, vbox2, vbox3);
+        Button okButton = new Button("OK");
+        Button resetButton = new Button("Reset Scores");
+        okButton.setMinWidth(50);
+        resetButton.setMinWidth(50);
+        HBox buttonHbox = new HBox(20,resetButton,okButton);
+        Scene scene = new Scene(new VBox(hbox,buttonHbox));
+
+        stage.setScene(scene);
+        stage.show();
+
+        //
+        vbox.layoutXProperty().bind(stage.widthProperty().divide(3).subtract(vbox.getWidth()));
+        vbox2.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(vbox2.getWidth()/2.0));
+        vbox3.layoutXProperty().bind(stage.widthProperty().divide(1.3));
+        buttonHbox.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(buttonHbox.getWidth()/2.0));
+
+        vbox.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vbox.getHeight()));
+        vbox2.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vbox2.getHeight()));
+        vbox3.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vbox3.getHeight()));
+        buttonHbox.layoutYProperty().bind(stage.heightProperty().divide(1.5).subtract(buttonHbox.getHeight()/2.0));
+
+        okButton.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown()) {
+                stage.close();
+            }
+        });
+
+        //TODO If ENTER then the same
+        resetButton.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown()) {
+                Stage stage2 = new Stage();
+                Label text = new Label("Are you sure?");
+                text.setPadding(new Insets(20, 20, 20, 28));
+                Button button1 = new Button("Yes");
+                Button button2 = new Button("No");
+                HBox Hbox = new HBox(20,button1,button2);
+                Hbox.setPadding(new Insets(0, 20, 20, 20));
+                Scene scene2 = new Scene(new VBox(text,Hbox));
+                stage2.setScene(scene2);
+                stage2.setResizable(false);
+                stage2.show();
+
+                button1.setOnMousePressed(event2 -> {
+                    if (event.isPrimaryButtonDown()) {
+                        highScores.put("beginner","Anonymous;999");
+                        highScores.put("intermediate","Anonymous;999");
+                        highScores.put("expert","Anonymous;999");
+                        stage2.close();
+                        stage.close();
+                        writeToFile();
+                        getHighScoreWindow();
+                    }
+                });
+
+                button2.setOnMousePressed(event2 -> {
+                    if (event.isPrimaryButtonDown()) {
+                        stage2.close();
+                    }
+                });
+
+            }
+        });
+
     }
 
     //Method that shows a separate window where you can input custom board measurements
@@ -325,7 +398,7 @@ public class MainClass extends Application {
         return images;
     }
 
-    void checkFlags() {
+    private void checkFlags() {
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
                 if (userBoard.getBoard()[i][j] == -5 && realBoard.getBoard()[i][j] != -1)
@@ -373,7 +446,7 @@ public class MainClass extends Application {
                         openedSquaresNow = userBoard.countOpened();
 
 
-                        Node result = null;
+                        Node result;
                         ObservableList<Node> childrens = gridpane.getChildren();
 
                         //printM_ind(" ", userBoard.getBoard());
