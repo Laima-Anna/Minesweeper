@@ -32,70 +32,11 @@ public class MainClass extends Application {
     private int boardHeight;
     private int boardWidth;
     private int bombCount;
-    private String level="beginner";
+    private String level;
     private Stage stage;
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    public static void openAround(int x, int y, UserBoard userBoard, Board realBoard, List<List<Integer>> checked) {
-        int[] numbers = realBoard.getNumbersAround(x, y);
-
-        List<Integer> uus = new ArrayList<>();
-        uus.add(x);
-        uus.add(y);
-        if (!checked.contains(uus)) checked.add(uus);
-
-        if (numbers[0] != -9) userBoard.getBoard()[x - 1][y - 1] = realBoard.getBoard()[x - 1][y - 1];
-        if (numbers[1] != -9) userBoard.getBoard()[x - 1][y] = realBoard.getBoard()[x - 1][y];
-        if (numbers[2] != -9) userBoard.getBoard()[x - 1][y + 1] = realBoard.getBoard()[x - 1][y + 1];
-        if (numbers[3] != -9) userBoard.getBoard()[x][y - 1] = realBoard.getBoard()[x][y - 1];
-        if (numbers[4] != -9) userBoard.getBoard()[x][y + 1] = realBoard.getBoard()[x][y + 1];
-        if (numbers[5] != -9) userBoard.getBoard()[x + 1][y - 1] = realBoard.getBoard()[x + 1][y - 1];
-        if (numbers[6] != -9) userBoard.getBoard()[x + 1][y] = realBoard.getBoard()[x + 1][y];
-        if (numbers[7] != -9) userBoard.getBoard()[x + 1][y + 1] = realBoard.getBoard()[x + 1][y + 1];
-
-        //TODO here and for cycle with values x and y
-        List<Integer> uus2 = new ArrayList<>();
-        uus2.add(x - 1);
-        uus2.add(y - 1);
-        if (numbers[0] == 0 && !checked.contains(uus2)) openAround(x - 1, y - 1, userBoard, realBoard, checked);
-
-        List<Integer> uus3 = new ArrayList<>();
-        uus3.add(x - 1);
-        uus3.add(y);
-        if (numbers[1] == 0 && !checked.contains(uus3)) openAround(x - 1, y, userBoard, realBoard, checked);
-
-        List<Integer> uus4 = new ArrayList<>();
-        uus4.add(x - 1);
-        uus4.add(y + 1);
-        if (numbers[2] == 0 && !checked.contains(uus4)) openAround(x - 1, y + 1, userBoard, realBoard, checked);
-
-        List<Integer> uus5 = new ArrayList<>();
-        uus5.add(x);
-        uus5.add(y - 1);
-        if (numbers[3] == 0 && !checked.contains(uus5)) openAround(x, y - 1, userBoard, realBoard, checked);
-
-        List<Integer> uus6 = new ArrayList<>();
-        uus6.add(x);
-        uus6.add(y + 1);
-        if (numbers[4] == 0 && !checked.contains(uus6)) openAround(x, y + 1, userBoard, realBoard, checked);
-
-        List<Integer> uus7 = new ArrayList<>();
-        uus7.add(x + 1);
-        uus7.add(y - 1);
-        if (numbers[5] == 0 && !checked.contains(uus7)) openAround(x + 1, y - 1, userBoard, realBoard, checked);
-
-        List<Integer> uus8 = new ArrayList<>();
-        uus8.add(x + 1);
-        uus8.add(y);
-        if (numbers[6] == 0 && !checked.contains(uus8)) openAround(x + 1, y, userBoard, realBoard, checked);
-
-        List<Integer> uus9 = new ArrayList<>();
-        uus9.add(x + 1);
-        uus9.add(y + 1);
-        if (numbers[7] == 0 && !checked.contains(uus9)) openAround(x + 1, y + 1, userBoard, realBoard, checked);
     }
 
     @Override
@@ -104,11 +45,11 @@ public class MainClass extends Application {
 
         //Program is started by default with beginner mode
         generateGame(9, 9, 10);
+        level="beginner";
     }
 
     //Sets up all the necessary elements to display game board
     private void generateGame(int height, int width, int bombcount) {
-
         startGame(height, width, bombcount);
 
         BorderPane root = new BorderPane();
@@ -128,58 +69,20 @@ public class MainClass extends Application {
         stage.centerOnScreen();
     }
 
-    public static String toStringJ(int[] var0, int var1, String var2) {
-        String var3 = "";
-        String var4 = "%" + var1 + "d";
+    private void startGame(int height, int width, int bombcount) {
+        //AnimationTimer needs to be initialized in the beginning, so we can use the variable immediately
+        clock = addTimeCounter();
+        clock.stop();
 
-        for (int var5 = 0; var5 < var0.length; ++var5) {
-            if (var5 == 0) {
-                var3 = var3 + String.format(var4, var0[var5]);
-            } else {
-                var3 = var3 + var2 + String.format(var4, var0[var5]);
-            }
-        }
+        this.boardHeight = height;
+        this.boardWidth = width;
+        this.bombCount = bombcount;
+        userBoard = new UserBoard(boardHeight, boardWidth, bombCount);
+        setRealBoard(boardHeight, boardWidth, bombCount);
+        checked = new ArrayList<>();
+        openedSquaresNow = 0;
+        allFreeSpaces = boardHeight * boardWidth - bombCount;
 
-        return var3;
-    }
-
-    public static void printM_ind(String var0, int[][] var1) {
-        int var2 = -2147483648;
-        int[][] var3 = var1;
-        int var4 = var1.length;
-
-        for (int var5 = 0; var5 < var4; ++var5) {
-            int[] var6 = var3[var5];
-            int[] var7 = var6;
-            int var8 = var6.length;
-
-            for (int var9 = 0; var9 < var8; ++var9) {
-                int var10 = var7[var9];
-                int var11 = ("" + var10).length();
-                if (var11 > var2) {
-                    var2 = var11;
-                }
-            }
-        }
-
-        int[] var12 = new int[var1[0].length];
-
-        for (var4 = 0; var4 < var1[0].length; var12[var4] = var4++) {
-        }
-
-        System.out.println(var0 + "   " + toStringJ(var12, var2, ".") + ".");
-
-        for (var4 = 0; var4 < var1.length; ++var4) {
-            String var13;
-            if (var4 < 10) {
-                var13 = var0 + " " + var4 + ". ";
-            } else {
-                var13 = var0 + var4 + ". ";
-            }
-
-            System.out.print(var13 + toStringJ(var1[var4], var2, " "));
-            System.out.println();
-        }
     }
 
     private MenuBar getMenuBar() {
@@ -347,21 +250,6 @@ public class MainClass extends Application {
         }
     }
 
-    private void startGame(int height, int width, int bombcount) {
-        //AnimationTimer needs to be initialized in the beginning, so we can use the variable immediately
-        clock = addTimeCounter();
-        clock.stop();
-
-        this.boardHeight = height;
-        this.boardWidth = width;
-        this.bombCount = bombcount;
-        userBoard = new UserBoard(boardHeight, boardWidth, bombCount);
-        setRealBoard(boardHeight, boardWidth, bombCount);
-        checked = new ArrayList<>();
-        openedSquaresNow = 0;
-        allFreeSpaces = boardHeight * boardWidth - bombCount;
-
-    }
 
     private void setRealBoard(int boardHeight, int boardWidth, int bombCount) {
         realBoard = new Board(boardHeight, boardWidth, bombCount);
@@ -460,7 +348,6 @@ public class MainClass extends Application {
                 label.setGraphic(view);
                 gridpane.add(label, i, j);
 
-                //TODO - keyboard event  and mousepressed event
                 label.setOnMousePressed(event -> {
                     if (event.isPrimaryButtonDown()) {
                         if (firstClick[0]) {
@@ -673,5 +560,118 @@ public class MainClass extends Application {
             }
         };
         return timer;
+    }
+
+    public static void openAround(int x, int y, UserBoard userBoard, Board realBoard, List<List<Integer>> checked) {
+        int[] numbers = realBoard.getNumbersAround(x, y);
+
+        List<Integer> uus = new ArrayList<>();
+        uus.add(x);
+        uus.add(y);
+        if (!checked.contains(uus)) checked.add(uus);
+
+        if (numbers[0] != -9) userBoard.getBoard()[x - 1][y - 1] = realBoard.getBoard()[x - 1][y - 1];
+        if (numbers[1] != -9) userBoard.getBoard()[x - 1][y] = realBoard.getBoard()[x - 1][y];
+        if (numbers[2] != -9) userBoard.getBoard()[x - 1][y + 1] = realBoard.getBoard()[x - 1][y + 1];
+        if (numbers[3] != -9) userBoard.getBoard()[x][y - 1] = realBoard.getBoard()[x][y - 1];
+        if (numbers[4] != -9) userBoard.getBoard()[x][y + 1] = realBoard.getBoard()[x][y + 1];
+        if (numbers[5] != -9) userBoard.getBoard()[x + 1][y - 1] = realBoard.getBoard()[x + 1][y - 1];
+        if (numbers[6] != -9) userBoard.getBoard()[x + 1][y] = realBoard.getBoard()[x + 1][y];
+        if (numbers[7] != -9) userBoard.getBoard()[x + 1][y + 1] = realBoard.getBoard()[x + 1][y + 1];
+
+        //TODO here and for cycle with values x and y
+        List<Integer> uus2 = new ArrayList<>();
+        uus2.add(x - 1);
+        uus2.add(y - 1);
+        if (numbers[0] == 0 && !checked.contains(uus2)) openAround(x - 1, y - 1, userBoard, realBoard, checked);
+
+        List<Integer> uus3 = new ArrayList<>();
+        uus3.add(x - 1);
+        uus3.add(y);
+        if (numbers[1] == 0 && !checked.contains(uus3)) openAround(x - 1, y, userBoard, realBoard, checked);
+
+        List<Integer> uus4 = new ArrayList<>();
+        uus4.add(x - 1);
+        uus4.add(y + 1);
+        if (numbers[2] == 0 && !checked.contains(uus4)) openAround(x - 1, y + 1, userBoard, realBoard, checked);
+
+        List<Integer> uus5 = new ArrayList<>();
+        uus5.add(x);
+        uus5.add(y - 1);
+        if (numbers[3] == 0 && !checked.contains(uus5)) openAround(x, y - 1, userBoard, realBoard, checked);
+
+        List<Integer> uus6 = new ArrayList<>();
+        uus6.add(x);
+        uus6.add(y + 1);
+        if (numbers[4] == 0 && !checked.contains(uus6)) openAround(x, y + 1, userBoard, realBoard, checked);
+
+        List<Integer> uus7 = new ArrayList<>();
+        uus7.add(x + 1);
+        uus7.add(y - 1);
+        if (numbers[5] == 0 && !checked.contains(uus7)) openAround(x + 1, y - 1, userBoard, realBoard, checked);
+
+        List<Integer> uus8 = new ArrayList<>();
+        uus8.add(x + 1);
+        uus8.add(y);
+        if (numbers[6] == 0 && !checked.contains(uus8)) openAround(x + 1, y, userBoard, realBoard, checked);
+
+        List<Integer> uus9 = new ArrayList<>();
+        uus9.add(x + 1);
+        uus9.add(y + 1);
+        if (numbers[7] == 0 && !checked.contains(uus9)) openAround(x + 1, y + 1, userBoard, realBoard, checked);
+    }
+
+    public static String toStringJ(int[] var0, int var1, String var2) {
+        String var3 = "";
+        String var4 = "%" + var1 + "d";
+
+        for (int var5 = 0; var5 < var0.length; ++var5) {
+            if (var5 == 0) {
+                var3 = var3 + String.format(var4, var0[var5]);
+            } else {
+                var3 = var3 + var2 + String.format(var4, var0[var5]);
+            }
+        }
+
+        return var3;
+    }
+
+    public static void printM_ind(String var0, int[][] var1) {
+        int var2 = -2147483648;
+        int[][] var3 = var1;
+        int var4 = var1.length;
+
+        for (int var5 = 0; var5 < var4; ++var5) {
+            int[] var6 = var3[var5];
+            int[] var7 = var6;
+            int var8 = var6.length;
+
+            for (int var9 = 0; var9 < var8; ++var9) {
+                int var10 = var7[var9];
+                int var11 = ("" + var10).length();
+                if (var11 > var2) {
+                    var2 = var11;
+                }
+            }
+        }
+
+        int[] var12 = new int[var1[0].length];
+
+        for (var4 = 0; var4 < var1[0].length; var12[var4] = var4++) {
+        }
+
+        System.out.println(var0 + "   " + toStringJ(var12, var2, ".") + ".");
+
+        for (var4 = 0; var4 < var1.length; ++var4) {
+            String var13;
+            if (var4 < 10) {
+                var13 = var0 + " " + var4 + ". ";
+            } else {
+                var13 = var0 + var4 + ". ";
+            }
+
+            System.out.print(var13 + toStringJ(var1[var4], var2, " "));
+            System.out.println();
+        }
     }
 }
