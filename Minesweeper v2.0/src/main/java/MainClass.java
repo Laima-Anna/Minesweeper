@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -14,13 +15,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 public class MainClass extends Application {
-    private Map<String,String> highScores= new HashMap<>();
+    private Map<String,String> highScores;
     private List<Image> images = getImages();
     private UserBoard userBoard;
     private Board realBoard;
@@ -49,7 +48,9 @@ public class MainClass extends Application {
     }
 
     //Sets up all the necessary elements to display game board
-    private void generateGame(int height, int width, int bombcount) {
+    private void generateGame(int height, int width, int bombcount){
+        highScores = readFromFile();
+
         startGame(height, width, bombcount);
 
         BorderPane root = new BorderPane();
@@ -99,16 +100,16 @@ public class MainClass extends Application {
         RadioMenuItem choice1Item = new RadioMenuItem("Beginner");
         choice1Item.setAccelerator(KeyCombination.keyCombination("B"));
         choice1Item.setOnAction(e -> {
+            level="beginner";
             clock.stop();
             generateGame(9, 9, 10);
-            level="beginner";
         });
         RadioMenuItem choice2Item = new RadioMenuItem("Intermediate");
         choice2Item.setAccelerator(KeyCombination.keyCombination("I"));
         choice2Item.setOnAction(e -> {
+            level="intermediate";
             clock.stop();
             generateGame(16, 16, 40);
-            level="intermediate";
         });
         RadioMenuItem choice3Item = new RadioMenuItem("Expert");
         choice3Item.setAccelerator(KeyCombination.keyCombination("E"));
@@ -450,13 +451,11 @@ public class MainClass extends Application {
                     }
 
                     if (openedSquaresNow == allFreeSpaces) { //if there is the same number of opened squares as originally planned
-                        System.out.println("You won!");
-                        if(level.equals("beginner")){
-                            String a = highScores.get("beginner");
-                            String[] eraldi = a.split(",");
-                            if(Integer.parseInt(eraldi[1])<Integer.parseInt(clock.toString())){
+                        System.out.println("You won!"); //TODO somewhere needs to be shown
 
-                            }
+                        String[] eraldi = highScores.get(level).split(";");
+                        if(Integer.parseInt(eraldi[1])>Integer.parseInt(clock.toString())){
+                            setHighScore(clock.toString());
                         }
                         clock.stop();
                     }
@@ -465,6 +464,83 @@ public class MainClass extends Application {
                 });
             }
         }
+    }
+
+    private void setHighScore(String time){
+        Stage custom = new Stage();
+
+        Label text = new Label("You have the fastest time for "+level+" level");
+        Label text2 = new Label("Please enter your name: ");
+
+        TextField nameTextField = new TextField();
+        nameTextField.setPrefWidth(200);
+        nameTextField.setText("Anonymous");
+        HBox hBox = new HBox(nameTextField);
+        hBox.setPadding(new Insets(0, 0, 0, 50));
+
+        Button okButton = new Button("OK");
+        okButton.setMinWidth(50);
+        HBox hBox2 = new HBox(okButton);
+        hBox2.setPadding(new Insets(0, 0, 0, 125));
+
+        VBox vbox = new VBox(5);
+
+        vbox.getChildren().addAll(text,text2,hBox,hBox2);
+
+        Scene scene = new Scene(vbox,300,110);
+
+        custom.setScene(scene);
+        custom.show();
+
+        text.setPadding(new Insets(0, 0, 0, (300-text.getWidth())/2.0));
+        text2.setPadding(new Insets(0, 0, 0, (300-text2.getWidth())/2.0));
+
+        nameTextField.setOnKeyReleased(event -> {
+            if(event.getCode().equals(KeyCode.ENTER)){
+                highScores.put(level,nameTextField.getText()+";"+time);
+                writeToFile();
+                custom.close();
+            }
+        });
+        okButton.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown()) {
+                highScores.put(level,nameTextField.getText()+";"+time);
+                writeToFile();
+                custom.close();
+            }
+        });
+
+    }
+
+    private Map<String,String> readFromFile() {
+        Map<String,String> highScores = new HashMap<>();
+
+        try(BufferedReader br = new BufferedReader(new FileReader("highScores.txt"))) {
+            String line = br.readLine();
+            while (line != null) {
+                String[] sep = line.split(";");
+                highScores.put(sep[0],sep[1]+";"+sep[2]);
+                line = br.readLine();
+            }
+        } catch (IOException e){
+            System.out.println(e);
+        }
+
+        return highScores;
+    }
+
+    private void writeToFile(){
+
+        try(BufferedWriter br = new BufferedWriter(new FileWriter("highScores.txt"))) {
+            br.write("beginner;"+highScores.get("beginner")+"\n");
+            br.write("intermediate;"+highScores.get("intermediate")+"\n");
+            br.write("expert;"+highScores.get("expert"));
+
+
+        } catch (IOException e){
+            System.out.println(e);
+        }
+
     }
 
     //Method that adds flagged bomb counter to the left
@@ -562,7 +638,7 @@ public class MainClass extends Application {
         return timer;
     }
 
-    public static void openAround(int x, int y, UserBoard userBoard, Board realBoard, List<List<Integer>> checked) {
+    private static void openAround(int x, int y, UserBoard userBoard, Board realBoard, List<List<Integer>> checked) {
         int[] numbers = realBoard.getNumbersAround(x, y);
 
         List<Integer> uus = new ArrayList<>();
@@ -621,7 +697,7 @@ public class MainClass extends Application {
         if (numbers[7] == 0 && !checked.contains(uus9)) openAround(x + 1, y + 1, userBoard, realBoard, checked);
     }
 
-    public static String toStringJ(int[] var0, int var1, String var2) {
+    private static String toStringJ(int[] var0, int var1, String var2) {
         String var3 = "";
         String var4 = "%" + var1 + "d";
 
