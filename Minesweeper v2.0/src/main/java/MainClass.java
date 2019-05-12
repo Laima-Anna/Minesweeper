@@ -15,10 +15,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainClass extends Application {
-
+    private Map<String,String> highScores= new HashMap<>();
     private List<Image> images = getImages();
     private UserBoard userBoard;
     private Board realBoard;
@@ -30,6 +32,7 @@ public class MainClass extends Application {
     private int boardHeight;
     private int boardWidth;
     private int bombCount;
+    private String level="beginner";
     private Stage stage;
 
     public static void main(String[] args) {
@@ -195,16 +198,19 @@ public class MainClass extends Application {
         choice1Item.setOnAction(e -> {
             clock.stop();
             generateGame(9, 9, 10);
+            level="beginner";
         });
         RadioMenuItem choice2Item = new RadioMenuItem("Intermediate");
         choice2Item.setAccelerator(KeyCombination.keyCombination("I"));
         choice2Item.setOnAction(e -> {
             clock.stop();
             generateGame(16, 16, 40);
+            level="intermediate";
         });
         RadioMenuItem choice3Item = new RadioMenuItem("Expert");
         choice3Item.setAccelerator(KeyCombination.keyCombination("E"));
         choice3Item.setOnAction(e -> {
+            level="expert";
             clock.stop();
             generateGame(16, 30, 99);
         });
@@ -219,7 +225,12 @@ public class MainClass extends Application {
         MenuItem menuItem5 = new MenuItem("High scores");
         menuItem5.setAccelerator(KeyCombination.keyCombination("H"));
         menuItem5.setOnAction(e -> {
-            System.out.println("Menu Item 1 Selected");
+            BorderPane root = new BorderPane();
+            Stage stage = new Stage();
+            stage.setTitle("High scores");
+            stage.setScene(new Scene(root, 400, 200));
+            stage.show();
+
         });
         MenuItem menuItem6 = new MenuItem("Exit");
         menuItem6.setAccelerator(KeyCombination.keyCombination("Q"));
@@ -358,7 +369,7 @@ public class MainClass extends Application {
 
         realBoard.setBomb(coordinates);
         realBoard.setNumbers();
-        printM_ind(" ", realBoard.getBoard());
+        //printM_ind(" ", realBoard.getBoard());
     }
 
     private BorderPane getMainPane() {
@@ -477,8 +488,8 @@ public class MainClass extends Application {
                         Node result = null;
                         ObservableList<Node> childrens = gridpane.getChildren();
 
-                        printM_ind(" ", userBoard.getBoard());
-                        printM_ind(" ", realBoard.getBoard());
+                        //printM_ind(" ", userBoard.getBoard());
+                        //printM_ind(" ", realBoard.getBoard());
                         for (int m = 0; m < childrens.size(); m++) {
                             result = childrens.get(m);
                             int value = userBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)];
@@ -553,6 +564,13 @@ public class MainClass extends Application {
 
                     if (openedSquaresNow == allFreeSpaces) { //if there is the same number of opened squares as originally planned
                         System.out.println("You won!");
+                        if(level.equals("beginner")){
+                            String a = highScores.get("beginner");
+                            String[] eraldi = a.split(",");
+                            if(Integer.parseInt(eraldi[1])<Integer.parseInt(clock.toString())){
+
+                            }
+                        }
                         clock.stop();
                     }
 
