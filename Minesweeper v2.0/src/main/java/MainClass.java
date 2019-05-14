@@ -1,6 +1,7 @@
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -9,6 +10,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -19,7 +22,7 @@ import java.io.*;
 import java.util.*;
 
 public class MainClass extends Application {
-    private Map<String,String> highScores;
+    private Map<String, String> highScores;
     private List<Image> images = getImages();
     private UserBoard userBoard;
     private Board realBoard;
@@ -44,11 +47,11 @@ public class MainClass extends Application {
 
         //Program is started by default with beginner mode
         generateGame(9, 9, 10);
-        level="beginner";
+        level = "beginner";
     }
 
     //Sets up all the necessary elements to display game board
-    private void generateGame(int height, int width, int bombcount){
+    private void generateGame(int height, int width, int bombcount) {
         highScores = readFromFile();
 
         startGame(height, width, bombcount);
@@ -68,6 +71,7 @@ public class MainClass extends Application {
         stage.setScene(scene);
         stage.show();
         stage.centerOnScreen();
+        stage.setResizable(false);
     }
 
     private void startGame(int height, int width, int bombcount) {
@@ -100,27 +104,28 @@ public class MainClass extends Application {
         RadioMenuItem choice1Item = new RadioMenuItem("Beginner");
         choice1Item.setAccelerator(KeyCombination.keyCombination("B"));
         choice1Item.setOnAction(e -> {
-            level="beginner";
+            level = "beginner";
             clock.stop();
             generateGame(9, 9, 10);
         });
         RadioMenuItem choice2Item = new RadioMenuItem("Intermediate");
         choice2Item.setAccelerator(KeyCombination.keyCombination("I"));
         choice2Item.setOnAction(e -> {
-            level="intermediate";
+            level = "intermediate";
             clock.stop();
             generateGame(16, 16, 40);
         });
         RadioMenuItem choice3Item = new RadioMenuItem("Expert");
         choice3Item.setAccelerator(KeyCombination.keyCombination("E"));
         choice3Item.setOnAction(e -> {
-            level="expert";
+            level = "expert";
             clock.stop();
             generateGame(16, 30, 99);
         });
         RadioMenuItem choice4Item = new RadioMenuItem("Custom");
         choice4Item.setAccelerator(KeyCombination.keyCombination("C"));
         choice4Item.setOnAction(e -> generateCustomBoard());
+
         ToggleGroup toggleGroup = new ToggleGroup();
         toggleGroup.getToggles().addAll(choice1Item, choice2Item, choice3Item, choice4Item);
 
@@ -137,13 +142,11 @@ public class MainClass extends Application {
 
         MenuItem menuItem2 = new MenuItem("How to");
         menuItem2.setOnAction(e -> {
-            System.out.println("Menu Item 1 Selected");
-            System.out.println();
+            getHowToWindow();
         });
         MenuItem menuItem3 = new MenuItem("About");
         menuItem3.setOnAction(e -> {
-            System.out.println("Menu Item 1 Selected");
-            System.out.println();
+            getAboutWindow();
         });
         menu2.getItems().addAll(menuItem2, menuItem3);
 
@@ -153,7 +156,7 @@ public class MainClass extends Application {
         return menuBar;
     }
 
-    private void getHighScoreWindow(){
+    private void getHighScoreWindow() {
         Stage stage = new Stage();
         stage.setMinHeight(200);
         stage.setMinWidth(300);
@@ -165,30 +168,30 @@ public class MainClass extends Application {
         String[] line2 = highScores.get("intermediate").split(";");
         String[] line3 = highScores.get("expert").split(";");
 
-        VBox vbox = new VBox(10, new Label("Beginner: "),new Label("Intermediate: "),new Label("Expert: "));
-        VBox vbox2 = new VBox(10,new Label(line1[0]),new Label(line2[0]),new Label(line3[0]));
-        VBox vbox3 = new VBox(10,new Label(line1[1]),new Label(line2[1]),new Label(line3[1]));
+        VBox vbox = new VBox(10, new Label("Beginner: "), new Label("Intermediate: "), new Label("Expert: "));
+        VBox vbox2 = new VBox(10, new Label(line1[0]), new Label(line2[0]), new Label(line3[0]));
+        VBox vbox3 = new VBox(10, new Label(line1[1]), new Label(line2[1]), new Label(line3[1]));
         HBox hbox = new HBox(vbox, vbox2, vbox3);
         Button okButton = new Button("OK");
         Button resetButton = new Button("Reset Scores");
         okButton.setMinWidth(50);
         resetButton.setMinWidth(50);
-        HBox buttonHbox = new HBox(20,resetButton,okButton);
-        Scene scene = new Scene(new VBox(hbox,buttonHbox));
+        HBox buttonHbox = new HBox(20, resetButton, okButton);
+        Scene scene = new Scene(new VBox(hbox, buttonHbox));
 
         stage.setScene(scene);
         stage.show();
 
         //
         vbox.layoutXProperty().bind(stage.widthProperty().divide(3).subtract(vbox.getWidth()));
-        vbox2.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(vbox2.getWidth()/2.0));
+        vbox2.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(vbox2.getWidth() / 2.0));
         vbox3.layoutXProperty().bind(stage.widthProperty().divide(1.3));
-        buttonHbox.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(buttonHbox.getWidth()/2.0));
+        buttonHbox.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(buttonHbox.getWidth() / 2.0));
 
         vbox.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vbox.getHeight()));
         vbox2.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vbox2.getHeight()));
         vbox3.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vbox3.getHeight()));
-        buttonHbox.layoutYProperty().bind(stage.heightProperty().divide(1.5).subtract(buttonHbox.getHeight()/2.0));
+        buttonHbox.layoutYProperty().bind(stage.heightProperty().divide(1.5).subtract(buttonHbox.getHeight() / 2.0));
 
         okButton.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
@@ -204,18 +207,18 @@ public class MainClass extends Application {
                 text.setPadding(new Insets(20, 20, 20, 28));
                 Button button1 = new Button("Yes");
                 Button button2 = new Button("No");
-                HBox Hbox = new HBox(20,button1,button2);
+                HBox Hbox = new HBox(20, button1, button2);
                 Hbox.setPadding(new Insets(0, 20, 20, 20));
-                Scene scene2 = new Scene(new VBox(text,Hbox));
+                Scene scene2 = new Scene(new VBox(text, Hbox));
                 stage2.setScene(scene2);
                 stage2.setResizable(false);
                 stage2.show();
 
                 button1.setOnMousePressed(event2 -> {
                     if (event.isPrimaryButtonDown()) {
-                        highScores.put("beginner","Anonymous;999");
-                        highScores.put("intermediate","Anonymous;999");
-                        highScores.put("expert","Anonymous;999");
+                        highScores.put("beginner", "Anonymous;999");
+                        highScores.put("intermediate", "Anonymous;999");
+                        highScores.put("expert", "Anonymous;999");
                         stage2.close();
                         stage.close();
                         writeToFile();
@@ -257,6 +260,8 @@ public class MainClass extends Application {
 
         Button okButton = new Button("OK");
         okButton.setMinWidth(50);
+        okButton.setDefaultButton(true);
+
         Button cancelButton = new Button("Cancel");
         cancelButton.setMinWidth(50);
 
@@ -271,6 +276,7 @@ public class MainClass extends Application {
 
         custom.setScene(scene);
         custom.show();
+        custom.setResizable(false);
 
         cancelButton.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
@@ -282,37 +288,96 @@ public class MainClass extends Application {
         final int[] y = new int[1];
         final int[] bombs = new int[1];
 
-        okButton.setOnMousePressed(event -> {
-            if (event.isPrimaryButtonDown()) {
-                clock.stop();
+        okButton.setOnAction(event -> {
+            clock.stop();
 
-                //if textfield values are not numeric, then use current boardheight and boardwidth and bombcount of 10
-                if (isNumeric(heightField.getText())) x[0] = Integer.parseInt(heightField.getText());
-                else x[0] = boardHeight;
+            //if textfield values are not numeric, then use current boardheight and boardwidth and bombcount of 10
+            if (isNumeric(heightField.getText())) x[0] = Integer.parseInt(heightField.getText());
+            else x[0] = boardHeight;
 
-                if (isNumeric(widthField.getText())) y[0] = Integer.parseInt(widthField.getText());
-                else y[0] = boardWidth;
+            if (isNumeric(widthField.getText())) y[0] = Integer.parseInt(widthField.getText());
+            else y[0] = boardWidth;
 
-                if (isNumeric(minesField.getText())) bombs[0] = Integer.parseInt(minesField.getText());
-                else bombs[0] = 10;
+            if (isNumeric(minesField.getText())) bombs[0] = Integer.parseInt(minesField.getText());
+            else bombs[0] = 10;
 
-                //minimum height is 9 squares and maximum height 18
-                if (x[0] < 9) x[0] = 9;
-                else if (x[0] > 18) x[0] = 18;
+            //minimum height is 9 squares and maximum height 18
+            if (x[0] < 9) x[0] = 9;
+            else if (x[0] > 18) x[0] = 18;
 
-                //minimum width is 9 squares and maximum width 35
-                if (y[0] < 9) y[0] = 9;
-                else if (y[0] > 35) y[0] = 35;
+            //minimum width is 9 squares and maximum width 35
+            if (y[0] < 9) y[0] = 9;
+            else if (y[0] > 35) y[0] = 35;
 
-                //minimum bombcount is 10, maximum is the number of squares on the board minus 20
-                if (bombs[0] < 10) bombs[0] = 10;
-                else if (bombs[0] > (x[0] * y[0] - 20)) bombs[0] = (x[0] * y[0] - 20);
+            //minimum bombcount is 10, maximum is the number of squares on the board minus 20
+            if (bombs[0] < 10) bombs[0] = 10;
+            else if (bombs[0] > (x[0] * y[0] - 20)) bombs[0] = (x[0] * y[0] - 20);
 
-            }
+
             generateGame(x[0], y[0], bombs[0]);
             custom.close();
         });
+    }
 
+    private void getAboutWindow() {
+        Stage about = new Stage();
+
+        Label label = new Label();
+        label.setText("Classic Minesweeper game where the objective is to clear a rectangular board " +
+                "containing hidden bombs without detonating any of them, " +
+                "with help from clues about the number of neighboring mines in each field.");
+        label.setPadding(new Insets(10));
+        label.setMaxWidth(400);
+        label.setWrapText(true);
+
+        Label label2 = new Label();
+        label2.setText("Authors: Laima Anna Dalbina and Eva Ibrus");
+        label2.setPadding(new Insets(10));
+
+        Label label3 = new Label();
+        label3.setText("Course: Object-oriented Programming, 2018/19 Spring");
+        label3.setPadding(new Insets(10));
+
+        VBox vbox = new VBox();
+        vbox.getChildren().addAll(label, label2, label3);
+        Scene scene = new Scene(vbox);
+        about.setScene(scene);
+        about.show();
+        about.setResizable(false);
+    }
+
+    private void getHowToWindow() {
+        Stage howto = new Stage();
+        VBox vbox = new VBox();
+        vbox.setPadding(new Insets(20));
+
+        Label first = new Label();
+        first.setText("Each Minesweeper game starts out with a grid of unmarked squares. " +
+                "It's your job to use the numbers to figure out which of the blank squares have bombs and which are safe to click." +
+                "\n\nIf you click on a square containing a bomb, you lose. " +
+                "If you manage to click all the squares (without clicking on any bombs) you win. " +
+                "\n\nClicking a square which doesn't have a bomb reveals the number of neighbouring squares containing bombs. " +
+                "\n\nTo open a square, point at the square and click on it. To mark a square you think is a bomb, point and right-click." +
+                "Right-clicking twice will give you a question mark symbol which can be useful if you are unsure about a square. " +
+                "\n\nThe upper left corner contains the number of bombs left to find." +
+                "\n\nThe upper right corner contains a time counter. The timer will max out at 999 seconds. ");
+        first.setMaxWidth(400);
+        first.setWrapText(true);
+
+        Button okButton = new Button("OK");
+        okButton.setMinWidth(50);
+
+        okButton.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown()) {
+                howto.close();
+            }
+        });
+
+        vbox.getChildren().addAll(first, okButton);
+        Scene scene = new Scene(vbox);
+
+        howto.setScene(scene);
+        howto.show();
     }
 
     private static boolean isNumeric(String str) {
@@ -323,7 +388,6 @@ public class MainClass extends Application {
             return false;
         }
     }
-
 
     private void setRealBoard(int boardHeight, int boardWidth, int bombCount) {
         realBoard = new Board(boardHeight, boardWidth, bombCount);
@@ -445,7 +509,6 @@ public class MainClass extends Application {
                         }
                         openedSquaresNow = userBoard.countOpened();
 
-
                         Node result;
                         ObservableList<Node> childrens = gridpane.getChildren();
 
@@ -456,6 +519,16 @@ public class MainClass extends Application {
                             int value = userBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)];
                             Label label1 = (Label) result;
                             ImageView view5 = new ImageView(images.get(0));
+
+                            //disables right click on all squares that have been opened
+                            if (value == 0 || value == 1 || value == 2 || value == 3 || value == 4 || value == 5 ||
+                                    value == 6 || value == 7 || value == 8) {
+                                label1.addEventFilter(MouseEvent.MOUSE_PRESSED, ev -> {
+                                    if (ev.getButton() == MouseButton.SECONDARY) {
+                                        ev.consume();
+                                    }
+                                });
+                            }
 
                             if (value == 0) view5 = new ImageView(images.get(9));
                             else if (value == 1) view5 = new ImageView(images.get(1));
@@ -469,7 +542,10 @@ public class MainClass extends Application {
                             else if (value == -5) view5 = new ImageView(images.get(13));
                             else if (value == -3) view5 = new ImageView(images.get(14));
                             else if (value == -7) view5 = new ImageView(images.get(0));
-                            else if (value == -6) {
+
+                            //if you click on a square that has a bomb on it, the game stops and
+                            //all the squares on the board will be opened
+                            if (value == -6) {
 
                                 clock.stop();
 
@@ -497,12 +573,13 @@ public class MainClass extends Application {
                                     else if (value2 == -5) view6 = new ImageView(images.get(12));
 
                                     label2.setGraphic(view6);
-                                }
 
+                                    //disables all mouse events when a bomb has been clicked
+                                    label2.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
+                                }
                                 break;
                             }
                             label1.setGraphic(view5);
-
                         }
                     } else if (event.isSecondaryButtonDown()) {
                         if (compare[0].equals("notOpened")) {
@@ -527,22 +604,20 @@ public class MainClass extends Application {
                         System.out.println("You won!"); //TODO somewhere needs to be shown
 
                         String[] eraldi = highScores.get(level).split(";");
-                        if(Integer.parseInt(eraldi[1])>Integer.parseInt(clock.toString())){
+                        if (Integer.parseInt(eraldi[1]) > Integer.parseInt(clock.toString())) {
                             setHighScore(clock.toString());
                         }
                         clock.stop();
                     }
-
-                    //event.consume();
                 });
             }
         }
     }
 
-    private void setHighScore(String time){
+    private void setHighScore(String time) {
         Stage custom = new Stage();
 
-        Label text = new Label("You have the fastest time for "+level+" level");
+        Label text = new Label("You have the fastest time for " + level + " level");
         Label text2 = new Label("Please enter your name: ");
 
         TextField nameTextField = new TextField();
@@ -558,26 +633,26 @@ public class MainClass extends Application {
 
         VBox vbox = new VBox(5);
 
-        vbox.getChildren().addAll(text,text2,hBox,hBox2);
+        vbox.getChildren().addAll(text, text2, hBox, hBox2);
 
-        Scene scene = new Scene(vbox,300,110);
+        Scene scene = new Scene(vbox, 300, 110);
 
         custom.setScene(scene);
         custom.show();
 
-        text.setPadding(new Insets(0, 0, 0, (300-text.getWidth())/2.0));
-        text2.setPadding(new Insets(0, 0, 0, (300-text2.getWidth())/2.0));
+        text.setPadding(new Insets(0, 0, 0, (300 - text.getWidth()) / 2.0));
+        text2.setPadding(new Insets(0, 0, 0, (300 - text2.getWidth()) / 2.0));
 
         nameTextField.setOnKeyReleased(event -> {
-            if(event.getCode().equals(KeyCode.ENTER)){
-                highScores.put(level,nameTextField.getText()+";"+time);
+            if (event.getCode().equals(KeyCode.ENTER)) {
+                highScores.put(level, nameTextField.getText() + ";" + time);
                 writeToFile();
                 custom.close();
             }
         });
         okButton.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
-                highScores.put(level,nameTextField.getText()+";"+time);
+                highScores.put(level, nameTextField.getText() + ";" + time);
                 writeToFile();
                 custom.close();
             }
@@ -585,32 +660,32 @@ public class MainClass extends Application {
 
     }
 
-    private Map<String,String> readFromFile() {
-        Map<String,String> highScores = new HashMap<>();
+    private Map<String, String> readFromFile() {
+        Map<String, String> highScores = new HashMap<>();
 
-        try(BufferedReader br = new BufferedReader(new FileReader("highScores.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("highScores.txt"))) {
             String line = br.readLine();
             while (line != null) {
                 String[] sep = line.split(";");
-                highScores.put(sep[0],sep[1]+";"+sep[2]);
+                highScores.put(sep[0], sep[1] + ";" + sep[2]);
                 line = br.readLine();
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e);
         }
 
         return highScores;
     }
 
-    private void writeToFile(){
+    private void writeToFile() {
 
-        try(BufferedWriter br = new BufferedWriter(new FileWriter("highScores.txt"))) {
-            br.write("beginner;"+highScores.get("beginner")+"\n");
-            br.write("intermediate;"+highScores.get("intermediate")+"\n");
-            br.write("expert;"+highScores.get("expert"));
+        try (BufferedWriter br = new BufferedWriter(new FileWriter("highScores.txt"))) {
+            br.write("beginner;" + highScores.get("beginner") + "\n");
+            br.write("intermediate;" + highScores.get("intermediate") + "\n");
+            br.write("expert;" + highScores.get("expert"));
 
 
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e);
         }
 
@@ -698,6 +773,8 @@ public class MainClass extends Application {
 
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 time = Long.toString(elapsedTime / 1000);
+
+                //if counter reaches 999 seconds, the clock will stop
                 if (Integer.parseInt(time) == 999) this.stop();
 
                 top.setRight(setImagesToCounters(time, timeCounter));
