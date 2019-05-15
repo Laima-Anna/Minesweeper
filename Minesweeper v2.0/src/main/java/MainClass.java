@@ -16,6 +16,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -87,7 +88,6 @@ public class MainClass extends Application {
         checked = new ArrayList<>();
         openedSquaresNow = 0;
         allFreeSpaces = boardHeight * boardWidth - bombCount;
-
     }
 
     private MenuBar getMenuBar() {
@@ -124,7 +124,10 @@ public class MainClass extends Application {
         });
         RadioMenuItem choice4Item = new RadioMenuItem("Custom");
         choice4Item.setAccelerator(KeyCombination.keyCombination("C"));
-        choice4Item.setOnAction(e -> generateCustomBoard());
+        choice4Item.setOnAction(e -> {
+            level = "custom";
+            generateCustomBoard();
+        });
 
         ToggleGroup toggleGroup = new ToggleGroup();
         toggleGroup.getToggles().addAll(choice1Item, choice2Item, choice3Item, choice4Item);
@@ -182,7 +185,6 @@ public class MainClass extends Application {
         stage.setScene(scene);
         stage.show();
 
-        //
         vbox.layoutXProperty().bind(stage.widthProperty().divide(3).subtract(vbox.getWidth()));
         vbox2.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(vbox2.getWidth() / 2.0));
         vbox3.layoutXProperty().bind(stage.widthProperty().divide(1.3));
@@ -231,10 +233,8 @@ public class MainClass extends Application {
                         stage2.close();
                     }
                 });
-
             }
         });
-
     }
 
     //Method that shows a separate window where you can input custom board measurements
@@ -273,7 +273,6 @@ public class MainClass extends Application {
         hbox.getChildren().addAll(vbox, vbox2, vbox3);
 
         Scene scene = new Scene(hbox);
-
         custom.setScene(scene);
         custom.show();
         custom.setResizable(false);
@@ -475,7 +474,7 @@ public class MainClass extends Application {
     private void setImageToGridPane(GridPane gridpane) {
         final int[] bombsMarked = {0};
         final boolean[] firstClick = {true};
-        for (int i = 0; i < boardWidth; i++) {
+        for (int i = 0; i < boardWidth; i++)
             for (int j = 0; j < boardHeight; j++) {
                 final String[] compare = {"notOpened"};
 
@@ -547,6 +546,10 @@ public class MainClass extends Application {
                             //all the squares on the board will be opened
                             if (value == -6) {
 
+                                Label lost = new Label("You lost!");
+                                lost.setFont(new Font(25));
+                                top.setCenter(lost);
+
                                 clock.stop();
 
                                 ObservableList<Node> childrens2 = gridpane.getChildren();
@@ -601,17 +604,23 @@ public class MainClass extends Application {
                     }
 
                     if (openedSquaresNow == allFreeSpaces) { //if there is the same number of opened squares as originally planned
-                        System.out.println("You won!"); //TODO somewhere needs to be shown
+                        //disable mouse clicks on whole grid when game has been won
+                        gridpane.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
 
-                        String[] eraldi = highScores.get(level).split(";");
-                        if (Integer.parseInt(eraldi[1]) > Integer.parseInt(clock.toString())) {
-                            setHighScore(clock.toString());
+                        Label winning = new Label("You won!");
+                        winning.setFont(new Font(25));
+                        top.setCenter(winning);
+
+                        if (!level.equals("custom")) {
+                            String[] eraldi = highScores.get(level).split(";");
+                            if (Integer.parseInt(eraldi[1]) > Integer.parseInt(clock.toString())) {
+                                setHighScore(clock.toString());
+                            }
                         }
                         clock.stop();
                     }
                 });
             }
-        }
     }
 
     private void setHighScore(String time) {
