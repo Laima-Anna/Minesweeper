@@ -26,6 +26,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/*
+UserBoard:
+    0 empty square
+    1 - 8 numbers
+    -3 question mark
+    -5 flag
+    -6 mine which has been clicked on
+    -7 unopened square
+
+RealBoard:
+    0 empty square
+    1 - 8 numbers
+    -1 mine
+    opening when lost:
+        -5 flag, checks for wrongly placed bombs
+        -8 blown up bomb
+
+ */
+
 public class MainClass extends Application {
     private Map<String, String> highScores; //saves high scores
     private List<Image> images = getImages(); //stores list of images used in game
