@@ -1,3 +1,0 @@
-beginner;eva;24
-intermediate;Anonymous;999
-expert;Anonymous;999

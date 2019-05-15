@@ -219,9 +219,7 @@ public class MainClass extends Application {
 
                 button1.setOnAction(event2 -> {
                     if (event.isPrimaryButtonDown()) {
-                        highScores.put("beginner", "Anonymous;999");
-                        highScores.put("intermediate", "Anonymous;999");
-                        highScores.put("expert", "Anonymous;999");
+                        setDefaultHighScore();
                         stage2.close();
                         stage.close();
                         writeToFile();
@@ -475,7 +473,6 @@ public class MainClass extends Application {
         }
     }
 
-
     //Method to set board game tiles to board
     private void setImageToGridPane(GridPane gridpane) {
         final int[] bombsMarked = {0};
@@ -557,9 +554,9 @@ public class MainClass extends Application {
                             else if (value == 6) view5 = new ImageView(images.get(6));
                             else if (value == 7) view5 = new ImageView(images.get(7));
                             else if (value == 8) view5 = new ImageView(images.get(8));
-                            else if (value == -5) view5 = new ImageView(images.get(13));
-                            else if (value == -3) view5 = new ImageView(images.get(14));
-                            else if (value == -7) view5 = new ImageView(images.get(0));
+                            else if (value == -5) view5 = new ImageView(images.get(13)); //flag
+                            else if (value == -3) view5 = new ImageView(images.get(14)); //question mark
+                            else if (value == -7) view5 = new ImageView(images.get(0)); //unopened square
 
                             //if you click on a square that has a bomb on it, the game stops and
                             //all the squares on the board will be opened
@@ -590,9 +587,9 @@ public class MainClass extends Application {
                                     else if (value2 == 6) view6 = new ImageView(images.get(6));
                                     else if (value2 == 7) view6 = new ImageView(images.get(7));
                                     else if (value2 == 8) view6 = new ImageView(images.get(8));
-                                    else if (value2 == -1) view6 = new ImageView(images.get(10));
-                                    else if (value2 == -8) view6 = new ImageView(images.get(11));
-                                    else if (value2 == -5) view6 = new ImageView(images.get(12));
+                                    else if (value2 == -1) view6 = new ImageView(images.get(10)); //bomb
+                                    else if (value2 == -8) view6 = new ImageView(images.get(11)); //selected bomb
+                                    else if (value2 == -5) view6 = new ImageView(images.get(12)); //marked bomb in wrong location
 
                                     label2.setGraphic(view6);
 
@@ -651,7 +648,7 @@ public class MainClass extends Application {
 
     // if the person has new high score
     private void setHighScore(String time) {
-        Stage custom = new Stage();
+        Stage highscoreWindow = new Stage();
 
         Label text = new Label("You have the fastest time for " + level + " level");
         Label text2 = new Label("Please enter your name: ");
@@ -673,8 +670,8 @@ public class MainClass extends Application {
 
         Scene scene = new Scene(vbox, 300, 110);
 
-        custom.setScene(scene);
-        custom.show();
+        highscoreWindow.setScene(scene);
+        highscoreWindow.show();
 
         text.setPadding(new Insets(0, 0, 0, (300 - text.getWidth()) / 2.0));
         text2.setPadding(new Insets(0, 0, 0, (300 - text2.getWidth()) / 2.0));
@@ -683,33 +680,44 @@ public class MainClass extends Application {
             if (event.getCode().equals(KeyCode.ENTER)) {
                 highScores.put(level, nameTextField.getText() + ";" + time);
                 writeToFile();
-                custom.close();
+                highscoreWindow.close();
             }
         });
         okButton.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
                 highScores.put(level, nameTextField.getText() + ";" + time);
                 writeToFile();
-                custom.close();
+                highscoreWindow.close();
             }
         });
+    }
 
+    private void setDefaultHighScore() {
+        highScores = new HashMap<>();
+        highScores.put("beginner", "Anonymous;999");
+        highScores.put("intermediate", "Anonymous;999");
+        highScores.put("expert", "Anonymous;999");
     }
 
     private Map<String, String> readFromFile() {
         Map<String, String> highScores = new HashMap<>();
+        boolean inprogress = true;
 
-        try (BufferedReader br = new BufferedReader(new FileReader("highScores.txt"))) {
-            String line = br.readLine();
-            while (line != null) {
-                String[] sep = line.split(";");
-                highScores.put(sep[0], sep[1] + ";" + sep[2]);
-                line = br.readLine();
+        while (inprogress) {
+            try (BufferedReader br = new BufferedReader(new FileReader("highScores.txt"))) {
+                String line = br.readLine();
+                while (line != null) {
+                    String[] sep = line.split(";");
+                    highScores.put(sep[0], sep[1] + ";" + sep[2]);
+                    line = br.readLine();
+                }
+                inprogress = false;
+            } catch (IOException e) {
+                //if file isn't found, a new file is created with default high score values
+                setDefaultHighScore();
+                writeToFile();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
         return highScores;
     }
 
@@ -720,11 +728,9 @@ public class MainClass extends Application {
             br.write("intermediate;" + highScores.get("intermediate") + "\n");
             br.write("expert;" + highScores.get("expert"));
 
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     //Method that adds flagged bomb counter to the left
