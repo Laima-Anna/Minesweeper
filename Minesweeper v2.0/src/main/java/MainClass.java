@@ -2,6 +2,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -20,7 +21,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainClass extends Application {
     private Map<String, String> highScores;
@@ -470,6 +474,7 @@ public class MainClass extends Application {
         }
     }
 
+
     //Method to set board game tiles to board
     private void setImageToGridPane(GridPane gridpane) {
         final int[] bombsMarked = {0};
@@ -486,6 +491,22 @@ public class MainClass extends Application {
                 gridpane.add(label, i, j);
 
                 label.setOnMousePressed(event -> {
+
+                    //Event handler for not allowing to open square if it has a flag
+                    EventHandler<MouseEvent> filter = new EventHandler<>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            System.out.println(event.getEventType());
+                            if (event.isPrimaryButtonDown()) {
+                                event.consume();
+                            } else if (event.isSecondaryButtonDown()) {
+                                label.removeEventFilter(MouseEvent.MOUSE_PRESSED, this);
+                            }
+
+                        }
+                    };
+
+
                     if (event.isPrimaryButtonDown()) {
                         if (firstClick[0]) {
                             //time starts counting when first square is opened
@@ -511,8 +532,6 @@ public class MainClass extends Application {
                         Node result;
                         ObservableList<Node> childrens = gridpane.getChildren();
 
-                        //printM_ind(" ", userBoard.getBoard());
-                        //printM_ind(" ", realBoard.getBoard());
                         for (int m = 0; m < childrens.size(); m++) {
                             result = childrens.get(m);
                             int value = userBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)];
@@ -590,6 +609,7 @@ public class MainClass extends Application {
                             userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -5;
                             compare[0] = "flag";
                             bombsMarked[0]++;
+                            label.addEventFilter(MouseEvent.MOUSE_PRESSED, filter);
                         } else if (compare[0].equals("flag")) {
                             label.setGraphic(view3);
                             userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -3;
@@ -814,7 +834,6 @@ public class MainClass extends Application {
         if (numbers[6] != -9) userBoard.getBoard()[x + 1][y] = realBoard.getBoard()[x + 1][y];
         if (numbers[7] != -9) userBoard.getBoard()[x + 1][y + 1] = realBoard.getBoard()[x + 1][y + 1];
 
-        //TODO here and for cycle with values x and y
         List<Integer> uus2 = new ArrayList<>();
         uus2.add(x - 1);
         uus2.add(y - 1);
@@ -856,6 +875,7 @@ public class MainClass extends Application {
         if (numbers[7] == 0 && !checked.contains(uus9)) openAround(x + 1, y + 1, userBoard, realBoard, checked);
     }
 
+    //method for printing
     private static String toStringJ(int[] var0, int var1, String var2) {
         String var3 = "";
         String var4 = "%" + var1 + "d";
@@ -871,6 +891,7 @@ public class MainClass extends Application {
         return var3;
     }
 
+    //method for printing
     public static void printM_ind(String var0, int[][] var1) {
         int var2 = -2147483648;
         int[][] var3 = var1;
