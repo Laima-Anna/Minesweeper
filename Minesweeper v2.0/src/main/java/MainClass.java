@@ -27,15 +27,15 @@ import java.util.List;
 import java.util.Map;
 
 public class MainClass extends Application {
-    private Map<String, String> highScores;
-    private List<Image> images = getImages();
-    private UserBoard userBoard;
-    private Board realBoard;
-    private int openedSquaresNow;
-    private List<List<Integer>> checked;
-    private int allFreeSpaces;
-    private BorderPane top;
-    private AnimationTimer clock;
+    private Map<String, String> highScores; //saves high scores
+    private List<Image> images = getImages(); //stores list of images used in game
+    private UserBoard userBoard; //used for storing values of a board which is visible to a player
+    private Board realBoard; //used for storing values of board which has the real values of the game
+    private int openedSquaresNow; //how many opened squares are at the moment
+    private List<List<Integer>> checked; //used in method openAround where it saves all checked squares at that time
+    private int allFreeSpaces; //saves how many spaces there are (all except bombs)
+    private BorderPane top; //pane for time counter
+    private AnimationTimer clock; //used for time
     private int boardHeight;
     private int boardWidth;
     private int bombCount;
@@ -56,20 +56,32 @@ public class MainClass extends Application {
     }
 
     //Sets up all the necessary elements to display game board
-    private void generateGame(int height, int width, int bombcount) {
+    private void generateGame(int height, int width, int bombCount) {
+        //Loading high scores from file
         highScores = readFromFile();
 
-        startGame(height, width, bombcount);
+        //AnimationTimer needs to be initialized in the beginning, so we can use the variable immediately
+        clock = addTimeCounter();
+        clock.stop();
+
+        this.boardHeight = height;
+        this.boardWidth = width;
+        this.bombCount = bombCount;
+        userBoard = new UserBoard(boardHeight, boardWidth, bombCount);
+        setRealBoard(boardHeight, boardWidth, bombCount);
+        checked = new ArrayList<>();
+        openedSquaresNow = 0;
+        allFreeSpaces = boardHeight * boardWidth - bombCount;
 
         BorderPane root = new BorderPane();
-        BorderPane root2 = getMainPane();
+        BorderPane mainPane = getMainPane();
 
         addBombCounter(0);
 
         MenuBar menuBar = getMenuBar();
 
         root.setTop(menuBar);
-        root.setCenter(root2);
+        root.setCenter(mainPane);
 
         Scene scene = new Scene(root);
 
@@ -79,27 +91,12 @@ public class MainClass extends Application {
         stage.setResizable(false);
     }
 
-    private void startGame(int height, int width, int bombcount) {
-        //AnimationTimer needs to be initialized in the beginning, so we can use the variable immediately
-        clock = addTimeCounter();
-        clock.stop();
-
-        this.boardHeight = height;
-        this.boardWidth = width;
-        this.bombCount = bombcount;
-        userBoard = new UserBoard(boardHeight, boardWidth, bombCount);
-        setRealBoard(boardHeight, boardWidth, bombCount);
-        checked = new ArrayList<>();
-        openedSquaresNow = 0;
-        allFreeSpaces = boardHeight * boardWidth - bombCount;
-    }
-
     private MenuBar getMenuBar() {
         Menu menu1 = new Menu("Game");
         Menu menu2 = new Menu("Help");
         Menu subMenu = new Menu("Levels");
         MenuItem menuItem1 = new MenuItem("New");
-        menuItem1.setAccelerator(KeyCombination.keyCombination("N"));
+        menuItem1.setAccelerator(KeyCombination.keyCombination("N")); //Adds keyboard shortcut
         menuItem1.setOnAction(e -> {
             //if new is selected, a new game is generated using the current board parameters
             clock.stop();
@@ -130,6 +127,7 @@ public class MainClass extends Application {
         choice4Item.setAccelerator(KeyCombination.keyCombination("C"));
         choice4Item.setOnAction(e -> {
             level = "custom";
+            clock.stop();
             generateCustomBoard();
         });
 
@@ -171,29 +169,31 @@ public class MainClass extends Application {
         String[] line2 = highScores.get("intermediate").split(";");
         String[] line3 = highScores.get("expert").split(";");
 
-        VBox vbox = new VBox(10, new Label("Beginner: "), new Label("Intermediate: "), new Label("Expert: "));
-        VBox vbox2 = new VBox(10, new Label(line1[0]), new Label(line2[0]), new Label(line3[0]));
-        VBox vbox3 = new VBox(10, new Label(line1[1]), new Label(line2[1]), new Label(line3[1]));
-        HBox hbox = new HBox(vbox, vbox2, vbox3);
+        VBox vBox1 = new VBox(10, new Label("Beginner: "), new Label("Intermediate: "), new Label("Expert: "));
+        VBox vBox2 = new VBox(10, new Label(line1[0]), new Label(line2[0]), new Label(line3[0]));
+        VBox vBox3 = new VBox(10, new Label(line1[1]), new Label(line2[1]), new Label(line3[1]));
+        HBox hbox = new HBox(vBox1, vBox2, vBox3);
+
         Button okButton = new Button("OK");
         Button resetButton = new Button("Reset Scores");
         okButton.setMinWidth(50);
         resetButton.setMinWidth(50);
-        HBox buttonHbox = new HBox(20, resetButton, okButton);
-        Scene scene = new Scene(new VBox(hbox, buttonHbox));
+        HBox buttonHBox = new HBox(20, resetButton, okButton);
 
+        Scene scene = new Scene(new VBox(hbox, buttonHBox));
         stage.setScene(scene);
         stage.show();
 
-        vbox.layoutXProperty().bind(stage.widthProperty().divide(3).subtract(vbox.getWidth()));
-        vbox2.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(vbox2.getWidth() / 2.0));
-        vbox3.layoutXProperty().bind(stage.widthProperty().divide(1.3));
-        buttonHbox.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(buttonHbox.getWidth() / 2.0));
+        //Binding vBoxes with stages width and height in order to have
+        vBox1.layoutXProperty().bind(stage.widthProperty().divide(3).subtract(vBox1.getWidth()));
+        vBox2.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(vBox2.getWidth() / 2.0));
+        vBox3.layoutXProperty().bind(stage.widthProperty().divide(1.3));
+        buttonHBox.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(buttonHBox.getWidth() / 2.0));
 
-        vbox.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vbox.getHeight()));
-        vbox2.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vbox2.getHeight()));
-        vbox3.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vbox3.getHeight()));
-        buttonHbox.layoutYProperty().bind(stage.heightProperty().divide(1.5).subtract(buttonHbox.getHeight() / 2.0));
+        vBox1.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vBox1.getHeight()));
+        vBox2.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vBox2.getHeight()));
+        vBox3.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vBox3.getHeight()));
+        buttonHBox.layoutYProperty().bind(stage.heightProperty().divide(1.5).subtract(buttonHBox.getHeight() / 2.0));
 
         okButton.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
@@ -201,14 +201,15 @@ public class MainClass extends Application {
             }
         });
 
-        //TODO If ENTER then the same
         resetButton.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
                 Stage stage2 = new Stage();
                 Label text = new Label("Are you sure?");
                 text.setPadding(new Insets(20, 20, 20, 28));
                 Button button1 = new Button("Yes");
+                button1.setDefaultButton(true);
                 Button button2 = new Button("No");
+                button2.setCancelButton(true);
                 HBox Hbox = new HBox(20, button1, button2);
                 Hbox.setPadding(new Insets(0, 20, 20, 20));
                 Scene scene2 = new Scene(new VBox(text, Hbox));
@@ -216,7 +217,7 @@ public class MainClass extends Application {
                 stage2.setResizable(false);
                 stage2.show();
 
-                button1.setOnMousePressed(event2 -> {
+                button1.setOnAction(event2 -> {
                     if (event.isPrimaryButtonDown()) {
                         highScores.put("beginner", "Anonymous;999");
                         highScores.put("intermediate", "Anonymous;999");
@@ -228,7 +229,7 @@ public class MainClass extends Application {
                     }
                 });
 
-                button2.setOnMousePressed(event2 -> {
+                button2.setOnAction(event2 -> {
                     if (event.isPrimaryButtonDown()) {
                         stage2.close();
                     }
@@ -290,7 +291,7 @@ public class MainClass extends Application {
         okButton.setOnAction(event -> {
             clock.stop();
 
-            //if textfield values are not numeric, then use current boardheight and boardwidth and bombcount of 10
+            //if textField values are not numeric, then use current boardHeight and boardWidth and bombCount of 10
             if (isNumeric(heightField.getText())) x[0] = Integer.parseInt(heightField.getText());
             else x[0] = boardHeight;
 
@@ -318,6 +319,7 @@ public class MainClass extends Application {
         });
     }
 
+    //Generates about window
     private void getAboutWindow() {
         Stage about = new Stage();
 
@@ -345,8 +347,9 @@ public class MainClass extends Application {
         about.setResizable(false);
     }
 
+    //generates how to window
     private void getHowToWindow() {
-        Stage howto = new Stage();
+        Stage howTo = new Stage();
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(20));
 
@@ -368,15 +371,15 @@ public class MainClass extends Application {
 
         okButton.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
-                howto.close();
+                howTo.close();
             }
         });
 
         vbox.getChildren().addAll(first, okButton);
         Scene scene = new Scene(vbox);
 
-        howto.setScene(scene);
-        howto.show();
+        howTo.setScene(scene);
+        howTo.show();
     }
 
     private static boolean isNumeric(String str) {
@@ -388,34 +391,34 @@ public class MainClass extends Application {
         }
     }
 
+    //Sets or resets real board
     private void setRealBoard(int boardHeight, int boardWidth, int bombCount) {
         realBoard = new Board(boardHeight, boardWidth, bombCount);
         List<ArrayList> coordinates = realBoard.setBombCoordinates(bombCount);
 
         realBoard.setBomb(coordinates);
         realBoard.setNumbers();
-        //printM_ind(" ", realBoard.getBoard());
     }
 
+    //Sets main game pane with squares (center) and timer (top)
     private BorderPane getMainPane() {
         BorderPane pane = new BorderPane();
         top = this.getBorderPane();
         top.setStyle("-fx-background-color: #bdbdbd;");
-        GridPane another = this.getGridPane();
+
+        GridPane mainSquarePane = new GridPane();
+        setImageToGridPane(mainSquarePane);
+
         pane.setTop(top);
-        pane.setCenter(another);
+        pane.setCenter(mainSquarePane);
+
         return pane;
     }
 
-    private GridPane getGridPane() {
-        GridPane gridpane = new GridPane();
-        setImageToGridPane(gridpane);
-        return gridpane;
-    }
-
+    //Generates borderPane for timer and score
     private BorderPane getBorderPane() {
         BorderPane borderpane = new BorderPane();
-        //adds borderpane to the right, where time counter will be placed
+        //adds borderPane to the right, where time counter will be placed
         BorderPane counter = new BorderPane();
         borderpane.setRight(counter);
 
@@ -426,6 +429,7 @@ public class MainClass extends Application {
         return borderpane;
     }
 
+    //Loads images from file into list
     private List<Image> getImages() {
         List<Image> images = new ArrayList<>();
 
@@ -461,6 +465,7 @@ public class MainClass extends Application {
         return images;
     }
 
+    //Checks whether there is flag in userBoard and puts in into realBoard
     private void checkFlags() {
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
@@ -480,9 +485,9 @@ public class MainClass extends Application {
                 final String[] compare = {"notOpened"};
 
                 Label label = new Label();
-                ImageView view = new ImageView(images.get(0));
-                ImageView view2 = new ImageView(images.get(13));
-                ImageView view3 = new ImageView(images.get(14));
+                ImageView view = new ImageView(images.get(0)); //unopened square
+                ImageView view2 = new ImageView(images.get(13)); //flag
+                ImageView view3 = new ImageView(images.get(14)); //question
                 label.setGraphic(view);
                 gridpane.add(label, i, j);
 
@@ -498,13 +503,11 @@ public class MainClass extends Application {
                             } else if (event.isSecondaryButtonDown()) {
                                 label.removeEventFilter(MouseEvent.MOUSE_PRESSED, this);
                             }
-
                         }
                     };
 
-
                     if (event.isPrimaryButtonDown()) {
-                        if (firstClick[0]) {
+                        if (firstClick[0]) { //if it is the first click then it generates new board until the clicked square is not a bomb
                             //time starts counting when first square is opened
                             clock = addTimeCounter();
                             clock.start();
@@ -517,8 +520,8 @@ public class MainClass extends Application {
                         int x = GridPane.getRowIndex(label);
                         int y = GridPane.getColumnIndex(label);
                         userBoard.getBoard()[x][y] = realBoard.getBoard()[x][y];
+
                         if (realBoard.getBoard()[x][y] == -1) {
-                            System.out.println("Game Over");
                             userBoard.getBoard()[x][y] = -6;
                         } else if (realBoard.getBoard()[x][y] == 0) {
                             openAround(x, y, userBoard, realBoard, checked);
@@ -526,11 +529,11 @@ public class MainClass extends Application {
                         openedSquaresNow = userBoard.countOpened();
 
                         Node result;
-                        ObservableList<Node> childrens = gridpane.getChildren();
+                        ObservableList<Node> children = gridpane.getChildren(); //list where are all squares (Nodes) in it
 
-                        for (Node children : childrens) {
-                            result = children;
-                            int value = userBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)];
+                        for (Node child : children) {
+                            result = child;
+                            int value = userBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)]; //value which a certain node has in userBoard
                             Label label1 = (Label) result;
                             ImageView view5 = new ImageView(images.get(0));
 
@@ -544,6 +547,7 @@ public class MainClass extends Application {
                                 });
                             }
 
+                            //sets the appropriate image according to userBoard
                             if (value == 0) view5 = new ImageView(images.get(9));
                             else if (value == 1) view5 = new ImageView(images.get(1));
                             else if (value == 2) view5 = new ImageView(images.get(2));
@@ -567,13 +571,13 @@ public class MainClass extends Application {
 
                                 clock.stop();
 
-                                ObservableList<Node> childrens2 = gridpane.getChildren();
+                                ObservableList<Node> children2 = gridpane.getChildren();
                                 realBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)] = -8;
                                 checkFlags();
 
-                                for (Node node : childrens2) {
-                                    result = node;
-                                    int value2 = realBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)];
+                                for (Node child2 : children2) {
+                                    result = child2;
+                                    int value2 = realBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)]; //value of realBoard node
                                     Label label2 = (Label) result;
                                     ImageView view6 = new ImageView(images.get(0));
 
@@ -599,6 +603,7 @@ public class MainClass extends Application {
                             }
                             label1.setGraphic(view5);
                         }
+
                     } else if (event.isSecondaryButtonDown()) {
                         switch (compare[0]) {
                             case "notOpened":
@@ -623,7 +628,8 @@ public class MainClass extends Application {
                         addBombCounter(bombsMarked[0]);
                     }
 
-                    if (openedSquaresNow == allFreeSpaces) { //if there is the same number of opened squares as originally planned
+                    //if there is the same number of opened squares as originally planned
+                    if (openedSquaresNow == allFreeSpaces) {
                         //disable mouse clicks on whole grid when game has been won
                         gridpane.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
 
@@ -643,6 +649,7 @@ public class MainClass extends Application {
             }
     }
 
+    // if the person has new high score
     private void setHighScore(String time) {
         Stage custom = new Stage();
 
