@@ -148,13 +148,9 @@ public class MainClass extends Application {
         menu1.getItems().addAll(menuItem1, subMenu, menuItem5, menuItem6);
 
         MenuItem menuItem2 = new MenuItem("How to");
-        menuItem2.setOnAction(e -> {
-            getHowToWindow();
-        });
+        menuItem2.setOnAction(e -> getHowToWindow());
         MenuItem menuItem3 = new MenuItem("About");
-        menuItem3.setOnAction(e -> {
-            getAboutWindow();
-        });
+        menuItem3.setOnAction(e -> getAboutWindow());
         menu2.getItems().addAll(menuItem2, menuItem3);
 
         MenuBar menuBar = new MenuBar();
@@ -312,7 +308,7 @@ public class MainClass extends Application {
             if (y[0] < 9) y[0] = 9;
             else if (y[0] > 35) y[0] = 35;
 
-            //minimum bombcount is 10, maximum is the number of squares on the board minus 20
+            //minimum bomb count is 10, maximum is the number of squares on the board minus 20
             if (bombs[0] < 10) bombs[0] = 10;
             else if (bombs[0] > (x[0] * y[0] - 20)) bombs[0] = (x[0] * y[0] - 20);
 
@@ -532,8 +528,8 @@ public class MainClass extends Application {
                         Node result;
                         ObservableList<Node> childrens = gridpane.getChildren();
 
-                        for (int m = 0; m < childrens.size(); m++) {
-                            result = childrens.get(m);
+                        for (Node children : childrens) {
+                            result = children;
                             int value = userBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)];
                             Label label1 = (Label) result;
                             ImageView view5 = new ImageView(images.get(0));
@@ -575,8 +571,8 @@ public class MainClass extends Application {
                                 realBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)] = -8;
                                 checkFlags();
 
-                                for (int m2 = 0; m2 < childrens2.size(); m2++) {
-                                    result = childrens2.get(m2);
+                                for (Node node : childrens2) {
+                                    result = node;
                                     int value2 = realBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)];
                                     Label label2 = (Label) result;
                                     ImageView view6 = new ImageView(images.get(0));
@@ -604,21 +600,25 @@ public class MainClass extends Application {
                             label1.setGraphic(view5);
                         }
                     } else if (event.isSecondaryButtonDown()) {
-                        if (compare[0].equals("notOpened")) {
-                            label.setGraphic(view2);
-                            userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -5;
-                            compare[0] = "flag";
-                            bombsMarked[0]++;
-                            label.addEventFilter(MouseEvent.MOUSE_PRESSED, filter);
-                        } else if (compare[0].equals("flag")) {
-                            label.setGraphic(view3);
-                            userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -3;
-                            compare[0] = "question";
-                            bombsMarked[0]--;
-                        } else if (compare[0].equals("question")) {
-                            label.setGraphic(view);
-                            userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -7;
-                            compare[0] = "notOpened";
+                        switch (compare[0]) {
+                            case "notOpened":
+                                label.setGraphic(view2);
+                                userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -5;
+                                compare[0] = "flag";
+                                bombsMarked[0]++;
+                                label.addEventFilter(MouseEvent.MOUSE_PRESSED, filter);
+                                break;
+                            case "flag":
+                                label.setGraphic(view3);
+                                userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -3;
+                                compare[0] = "question";
+                                bombsMarked[0]--;
+                                break;
+                            case "question":
+                                label.setGraphic(view);
+                                userBoard.getBoard()[GridPane.getRowIndex(label)][GridPane.getColumnIndex(label)] = -7;
+                                compare[0] = "notOpened";
+                                break;
                         }
                         addBombCounter(bombsMarked[0]);
                     }
@@ -700,7 +700,7 @@ public class MainClass extends Application {
                 line = br.readLine();
             }
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
         return highScores;
@@ -715,7 +715,7 @@ public class MainClass extends Application {
 
 
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
     }
@@ -771,12 +771,12 @@ public class MainClass extends Application {
                 //if nr is negative, don't show 0 on the left
                 if (numbers.charAt(0) == '-') {
                     if (i == 0) bp.setCenter(view);
-                    else if (i == 1) bp.setRight(view);
+                    else bp.setRight(view);
                 } else {
                     //first digit is zero
                     bp.setLeft(new ImageView(images.get(16)));
                     if (i == 0) bp.setCenter(view);
-                    else if (i == 1) bp.setRight(view);
+                    else bp.setRight(view);
                 }
             }
             //if number is 1 digit long, the first two numbers shown are both zeroes
@@ -877,18 +877,18 @@ public class MainClass extends Application {
 
     //method for printing
     private static String toStringJ(int[] var0, int var1, String var2) {
-        String var3 = "";
+        StringBuilder var3 = new StringBuilder();
         String var4 = "%" + var1 + "d";
 
         for (int var5 = 0; var5 < var0.length; ++var5) {
             if (var5 == 0) {
-                var3 = var3 + String.format(var4, var0[var5]);
+                var3.append(String.format(var4, var0[var5]));
             } else {
-                var3 = var3 + var2 + String.format(var4, var0[var5]);
+                var3.append(var2).append(String.format(var4, var0[var5]));
             }
         }
 
-        return var3;
+        return var3.toString();
     }
 
     //method for printing
@@ -912,9 +912,6 @@ public class MainClass extends Application {
         }
 
         int[] var12 = new int[var1[0].length];
-
-        for (var4 = 0; var4 < var1[0].length; var12[var4] = var4++) {
-        }
 
         System.out.println(var0 + "   " + toStringJ(var12, var2, ".") + ".");
 
