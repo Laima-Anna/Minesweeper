@@ -177,6 +177,7 @@ public class MainClass extends Application {
     }
 
     private void getHighScoreWindow() {
+
         Stage stage = new Stage();
         stage.setMinHeight(200);
         stage.setMinWidth(300);
@@ -196,14 +197,15 @@ public class MainClass extends Application {
         Button okButton = new Button("OK");
         Button resetButton = new Button("Reset Scores");
         okButton.setMinWidth(50);
+        okButton.setDefaultButton(true);
         resetButton.setMinWidth(50);
-        HBox buttonHBox = new HBox(20, resetButton, okButton);
+        HBox buttonHBox = new HBox(20, okButton, resetButton);
 
         Scene scene = new Scene(new VBox(hbox, buttonHBox));
         stage.setScene(scene);
         stage.show();
 
-        //Binding vBoxes with stages width and height in order to have
+        //Binding vBoxes with stages width and height in order to have responsive window
         vBox1.layoutXProperty().bind(stage.widthProperty().divide(3).subtract(vBox1.getWidth()));
         vBox2.layoutXProperty().bind(stage.widthProperty().divide(2).subtract(vBox2.getWidth() / 2.0));
         vBox3.layoutXProperty().bind(stage.widthProperty().divide(1.3));
@@ -214,11 +216,7 @@ public class MainClass extends Application {
         vBox3.layoutYProperty().bind(stage.heightProperty().divide(2).subtract(vBox3.getHeight()));
         buttonHBox.layoutYProperty().bind(stage.heightProperty().divide(1.5).subtract(buttonHBox.getHeight() / 2.0));
 
-        okButton.setOnMousePressed(event -> {
-            if (event.isPrimaryButtonDown()) {
-                stage.close();
-            }
-        });
+        okButton.setOnAction(event -> stage.close());
 
         resetButton.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
@@ -513,7 +511,6 @@ public class MainClass extends Application {
                     EventHandler<MouseEvent> filter = new EventHandler<>() {
                         @Override
                         public void handle(MouseEvent event) {
-                            System.out.println(event.getEventType());
                             if (event.isPrimaryButtonDown()) {
                                 event.consume();
                             } else if (event.isSecondaryButtonDown()) {
