@@ -326,7 +326,7 @@ public class MainClass extends Application {
 
             //minimum bomb count is 10, maximum is the number of squares on the board minus 20
             if (bombs[0] < 10) bombs[0] = 10;
-            else if (bombs[0] > (x[0] * y[0] - 70)) bombs[0] = (x[0] * y[0] - 70);
+            else if (bombs[0] > (x[0] * y[0] - 20)) bombs[0] = (x[0] * y[0] - 20);
 
 
             generateGame(x[0], y[0], bombs[0]);
@@ -380,14 +380,14 @@ public class MainClass extends Application {
                 "\n\nThe upper right corner contains a time counter. The timer will max out at 999 seconds. ");
         first.setMaxWidth(400);
         first.setWrapText(true);
+        first.setPadding(new Insets(0, 0, 10, 0));
 
         Button okButton = new Button("OK");
         okButton.setMinWidth(50);
+        okButton.setDefaultButton(true);
 
-        okButton.setOnMousePressed(event -> {
-            if (event.isPrimaryButtonDown()) {
-                howTo.close();
-            }
+        okButton.setOnAction(event -> {
+            howTo.close();
         });
 
         vbox.getChildren().addAll(first, okButton);
@@ -605,7 +605,8 @@ public class MainClass extends Application {
                                     else if (value2 == 8) view6 = new ImageView(images.get(8));
                                     else if (value2 == -1) view6 = new ImageView(images.get(10)); //bomb
                                     else if (value2 == -8) view6 = new ImageView(images.get(11)); //selected bomb
-                                    else if (value2 == -5) view6 = new ImageView(images.get(12)); //marked bomb in wrong location
+                                    else if (value2 == -5)
+                                        view6 = new ImageView(images.get(12)); //marked bomb in wrong location
 
                                     label2.setGraphic(view6);
 
