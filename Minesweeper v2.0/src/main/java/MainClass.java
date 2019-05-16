@@ -326,7 +326,7 @@ public class MainClass extends Application {
 
             //minimum bomb count is 10, maximum is the number of squares on the board minus 20
             if (bombs[0] < 10) bombs[0] = 10;
-            else if (bombs[0] > (x[0] * y[0] - 20)) bombs[0] = (x[0] * y[0] - 20);
+            else if (bombs[0] > (x[0] * y[0] - 70)) bombs[0] = (x[0] * y[0] - 70);
 
 
             generateGame(x[0], y[0], bombs[0]);
