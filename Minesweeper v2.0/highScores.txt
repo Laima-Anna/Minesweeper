@@ -1,0 +1,3 @@
+beginner;Laima;33
+intermediate;Anonymous;999
+expert;Anonymous;999
