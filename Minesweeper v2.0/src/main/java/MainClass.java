@@ -386,9 +386,7 @@ public class MainClass extends Application {
         okButton.setMinWidth(50);
         okButton.setDefaultButton(true);
 
-        okButton.setOnAction(event -> {
-            howTo.close();
-        });
+        okButton.setOnAction(event -> howTo.close());
 
         vbox.getChildren().addAll(first, okButton);
         Scene scene = new Scene(vbox);
@@ -436,6 +434,7 @@ public class MainClass extends Application {
         //adds borderPane to the right, where time counter will be placed
         BorderPane counter = new BorderPane();
         borderpane.setRight(counter);
+        counter.getChildren().add(new ImageView(images.get(26)));
 
         //shows three zeroes when board has been generated
         counter.setLeft(new ImageView(images.get(16)));
@@ -476,6 +475,10 @@ public class MainClass extends Application {
         images.add(new Image("File:images/9.png"));
         images.add(new Image("File:images/Counter.png"));
         images.add(new Image("File:images/Minus.png"));
+        images.add(new Image("File:images/Face.png"));
+        images.add(new Image("File:images/Happyface.png"));
+        images.add(new Image("File:images/Lost.png"));
+        images.add(new Image("File:images/Ohno.png"));
 
         return images;
     }
@@ -497,6 +500,16 @@ public class MainClass extends Application {
         for (int i = 0; i < boardWidth; i++)
             for (int j = 0; j < boardHeight; j++) {
                 final String[] compare = {"notOpened"};
+                final String[] gameOver = {"running"};
+
+                //adds new borderpane to the top center, where a face is located
+                BorderPane topCenterPane = new BorderPane();
+                ImageView normalFace = new ImageView(images.get(29));
+                topCenterPane.setCenter(normalFace);
+                top.setCenter(topCenterPane);
+
+                //clicking on the face will generate a new game
+                topCenterPane.setOnMouseClicked(event -> generateGame(boardHeight, boardWidth, bombCount));
 
                 Label label = new Label();
                 ImageView view = new ImageView(images.get(0)); //unopened square
@@ -506,6 +519,11 @@ public class MainClass extends Application {
                 gridpane.add(label, i, j);
 
                 label.setOnMousePressed(event -> {
+
+                    //when mouse is pressed, the face temporarily changes
+                    ImageView face = new ImageView(images.get(31));
+                    topCenterPane.setCenter(face);
+                    top.setCenter(topCenterPane);
 
                     //Event handler for not allowing to open square if it has a flag
                     EventHandler<MouseEvent> filter = new EventHandler<>() {
@@ -577,12 +595,12 @@ public class MainClass extends Application {
                             //if you click on a square that has a bomb on it, the game stops and
                             //all the squares on the board will be opened
                             if (value == -6) {
-
-                                Label lost = new Label("You lost!");
-                                lost.setFont(new Font(25));
-                                top.setCenter(lost);
-
                                 clock.stop();
+                                gameOver[0] = "finished";
+
+                                ImageView lostImage = new ImageView(images.get(30));
+                                topCenterPane.setCenter(lostImage);
+                                top.setCenter(topCenterPane);
 
                                 ObservableList<Node> children2 = gridpane.getChildren();
                                 realBoard.getBoard()[GridPane.getRowIndex(result)][GridPane.getColumnIndex(result)] = -8;
@@ -646,10 +664,11 @@ public class MainClass extends Application {
                     if (openedSquaresNow == allFreeSpaces) {
                         //disable mouse clicks on whole grid when game has been won
                         gridpane.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
+                        gameOver[0] = "finished";
 
-                        Label winning = new Label("You won!");
-                        winning.setFont(new Font(25));
-                        top.setCenter(winning);
+                        ImageView winningFace = new ImageView(images.get(28));
+                        topCenterPane.setCenter(winningFace);
+                        top.setCenter(topCenterPane);
 
                         if (!level.equals("custom")) {
                             String[] eraldi = highScores.get(level).split(";");
@@ -658,6 +677,14 @@ public class MainClass extends Application {
                             }
                         }
                         clock.stop();
+                    }
+
+                    //if game is not won or lost, then on mouse release the face in top center changes back to normal
+                    if(gameOver[0].equals("running")) {
+                        label.setOnMouseReleased(event1 -> {
+                            topCenterPane.setCenter(normalFace);
+                            top.setCenter(topCenterPane);
+                        });
                     }
                 });
             }
@@ -823,6 +850,7 @@ public class MainClass extends Application {
     private AnimationTimer addTimeCounter() {
         long startTime = System.currentTimeMillis();
         BorderPane timeCounter = new BorderPane();
+        timeCounter.getChildren().add(new ImageView(images.get(26)));
 
         AnimationTimer timer = new AnimationTimer() {
             String time;
